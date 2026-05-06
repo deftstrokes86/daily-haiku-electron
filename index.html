@@ -516,6 +516,7 @@
     border-color:rgba(232,203,157,.14);
     color:var(--fg);
   }
+  .sk .cs + .tr{margin-top:8px}
   .cs:hover,.cs:focus,.time-input:hover,.time-input:focus{border-color:rgba(var(--mood-rgb),.36)}
   .day{background:rgba(21,18,15,.45);border-color:rgba(232,203,157,.14);color:rgba(242,233,220,.5)}
   .day.on{border-color:rgba(var(--mood-rgb),.52);background:rgba(var(--mood-rgb),.13);color:var(--fg)}
@@ -690,8 +691,15 @@
         </div>
         <div class="sg">
           <div class="sl"><i class="fa-solid fa-bell"></i> Notifications</div>
-          <div class="sd">Show native Windows notification when a new haiku arrives</div>
-          <div class="sk"><div class="tr"><span style="font-size:13px;color:var(--fg-m)">Desktop notifications</span><button class="tg on" id="popupTgl" onclick="toggleSetting('popup')" aria-label="Toggle"></button></div></div>
+          <div class="sd">Choose how a new haiku appears when the active-time interval completes</div>
+          <div class="sk">
+            <select class="cs" id="notificationStyleSel" onchange="updateNotificationStyle()">
+              <option value="native">Native notification</option>
+              <option value="floating">Floating haiku card</option>
+              <option value="both">Both</option>
+            </select>
+            <div class="tr"><span style="font-size:13px;color:var(--fg-m)">Notification alerts</span><button class="tg on" id="popupTgl" onclick="toggleSetting('popup')" aria-label="Toggle"></button></div>
+          </div>
         </div>
         <div class="sg">
           <div class="sl"><i class="fa-solid fa-volume-high"></i> Sound</div>
@@ -788,7 +796,7 @@ function applyMoodAccent(mood){
 }
 
 // ===================== STATE =====================
-let S={cur:null,idx:-1,history:[],favs:[],interval:60,popup:true,sound:true,shownHaikuIds:[],timeWindowSettings:{...DEFAULT_TIME_WINDOW_SETTINGS}};
+let S={cur:null,idx:-1,history:[],favs:[],interval:60,popup:true,notificationStyle:'native',sound:true,shownHaikuIds:[],timeWindowSettings:{...DEFAULT_TIME_WINDOW_SETTINGS}};
 
 function load(){
   try{const d=JSON.parse(localStorage.getItem('dhState')||'{}');
@@ -796,13 +804,13 @@ function load(){
     S.shownHaikuIds=Array.isArray(d.shownHaikuIds)?d.shownHaikuIds:[];
     S.timeWindowSettings={...DEFAULT_TIME_WINDOW_SETTINGS,...(d.timeWindowSettings||{})};
     S.timeWindowSettings.workdays=Array.isArray(S.timeWindowSettings.workdays)?S.timeWindowSettings.workdays:[1,2,3,4,5];
-    S.popup=d.popup!==false;S.sound=d.sound!==false;
+    S.popup=d.popup!==false;S.notificationStyle=['native','floating','both'].includes(d.notificationStyle)?d.notificationStyle:'native';S.sound=d.sound!==false;
   }catch(e){}
 }
 function save(){
   try{localStorage.setItem('dhState',JSON.stringify({
     history:S.history.slice(0,20),favs:S.favs,interval:S.interval,
-    popup:S.popup,sound:S.sound,shownHaikuIds:S.shownHaikuIds,
+    popup:S.popup,notificationStyle:S.notificationStyle,sound:S.sound,shownHaikuIds:S.shownHaikuIds,
     timeWindowSettings:S.timeWindowSettings
   }))}catch(e){}
 }
@@ -867,6 +875,22 @@ function toggleFavorite(){
     date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'})});
     toast('Saved to favorites')}
   updFavBtn();updFavs();save();
+}
+function saveHaikuAsFavorite(h,showNotice=true){
+  if(!h)return false;
+  const normalized=HE.normalizeHaikus([h])[0];
+  if(!normalized)return false;
+  if(S.favs.some(f=>favId(f)===normalized.id)){
+    if(showNotice)toast('Already saved');
+    return false;
+  }
+  const i=haikus.findIndex(x=>x.id===normalized.id);
+  S.favs.unshift({id:normalized.id,t:HE.getHaikuText(normalized),i:i>-1?i:undefined,mood:normalized.mood,theme:normalized.theme,
+    time:new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}),
+    date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'})});
+  updFavBtn();updFavs();save();
+  if(showNotice)toast('Saved to favorites');
+  return true;
 }
 function updFavBtn(){
   const b=document.getElementById('favBtn'),f=S.favs.some(x=>favId(x)===S.cur?.id);
@@ -955,7 +979,11 @@ function triggerPopup(){
   if(!h)return;
   S.history.unshift(haikuRecord(h,i));
   S.history=S.history.slice(0,8);updHist();save();
-  if(S.popup&&window.electronAPI)window.electronAPI.showNativeNotification(HE.getHaikuLines(h).join(' / '));
+  if(S.popup&&window.electronAPI){
+    const payload={haiku:h,lines:HE.getHaikuLines(h),text:HE.getHaikuText(h),meta:HE.getHaikuMeta(h),notificationStyle:S.notificationStyle};
+    if(window.electronAPI.showHaikuNotification)window.electronAPI.showHaikuNotification(payload);
+    else window.electronAPI.showNativeNotification(HE.getHaikuLines(h).join(' / '));
+  }
   if(S.sound)playChime();
 }
 
@@ -1018,6 +1046,12 @@ function toggleSetting(t){
   else{S.sound=!S.sound;document.getElementById('soundTgl').classList.toggle('on',S.sound)}
   save();
 }
+function updateNotificationStyle(){
+  S.notificationStyle=document.getElementById('notificationStyleSel').value;
+  save();
+  const label={native:'Native notification',floating:'Floating haiku card',both:'Native and floating'}[S.notificationStyle]||'Native notification';
+  toast(`Notification style: ${label}`);
+}
 function toggleStartup(){
   const btn=document.getElementById('startupTgl'),on=btn.classList.toggle('on');
   if(window.electronAPI)window.electronAPI.toggleAutolaunch(on);
@@ -1055,6 +1089,7 @@ function wireElectron(){
   document.getElementById('closeBtn').addEventListener('click',()=>window.electronAPI.close());
   window.electronAPI.onTriggerPopup(()=>{triggerPopup()});
   window.electronAPI.onOpenSettings(()=>switchTab('settings'));
+  if(window.electronAPI.onFloatingHaikuSave)window.electronAPI.onFloatingHaikuSave(h=>saveHaikuAsFavorite(h));
   if(window.electronAPI.onSchedulerSnapshot)window.electronAPI.onSchedulerSnapshot(renderSchedulerSnapshot);
   window.electronAPI.updateInterval(S.interval);
   if(window.electronAPI.updateScheduleSettings)window.electronAPI.updateScheduleSettings(S.timeWindowSettings).then(renderSchedulerSnapshot).catch(()=>{});
@@ -1084,6 +1119,7 @@ async function init(){
   load();
   await loadHaikuData();
   document.getElementById('intervalSel').value=String(S.interval);
+  document.getElementById('notificationStyleSel').value=S.notificationStyle;
   document.getElementById('popupTgl').classList.toggle('on',S.popup);
   document.getElementById('soundTgl').classList.toggle('on',S.sound);
   renderTimeWindowSettings();

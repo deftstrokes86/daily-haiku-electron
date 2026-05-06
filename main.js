@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Tray, Menu, Notification, nativeImage, ipcMain, screen, powerMonitor } = require('electron');
+const { app, BrowserWindow, Tray, Menu, Notification, nativeImage, ipcMain, screen, powerMonitor, clipboard } = require('electron');
 const fs = require('fs');
 const path = require('path');
 const { createActiveTimeScheduler } = require('./src/scheduler/activeTimeScheduler');
@@ -13,6 +13,10 @@ const APP_NAME = 'Daily Haiku';
 const APP_ID = 'com.dailyhaiku.app';
 const WINDOW_WIDTH = 580;
 const WINDOW_HEIGHT = 660;
+const FLOATING_POPUP_WIDTH = 380;
+const FLOATING_POPUP_HEIGHT = 252;
+const FLOATING_POPUP_MARGIN = 24;
+const FLOATING_POPUP_DURATION_MS = 10 * 1000;
 const DEFAULT_INTERVAL_MINUTES = 60;
 const SCHEDULER_TICK_MS = 5 * 1000;
 const DEFAULT_IDLE_THRESHOLD_MS = 5 * 60 * 1000;
@@ -20,6 +24,10 @@ const DEFAULT_IDLE_THRESHOLD_MS = 5 * 60 * 1000;
 let mainWindow = null;
 let tray = null;
 let schedulerLoop = null;
+let floatingPopupWindow = null;
+let floatingPopupData = null;
+let floatingPopupTimer = null;
+let floatingPopupCloseTimer = null;
 let currentIntervalMinutes = DEFAULT_INTERVAL_MINUTES;
 let idleThresholdMs = DEFAULT_IDLE_THRESHOLD_MS;
 let scheduler = createActiveTimeScheduler({
@@ -90,16 +98,54 @@ function loadHaikuData() {
   return haikuDataCache;
 }
 
+function normalizeNotificationStyle(style) {
+  return ['native', 'floating', 'both'].includes(style) ? style : 'native';
+}
+
+function toText(value) {
+  return typeof value === 'string' ? value : '';
+}
+
+function normalizeHaikuNotificationPayload(payload = {}) {
+  const sourceHaiku = payload.haiku || {};
+  const sourceLines = Array.isArray(payload.lines) ? payload.lines : sourceHaiku.lines;
+  const lines = Array.isArray(sourceLines)
+    ? sourceLines.map((line) => String(line || '').trim()).filter(Boolean).slice(0, 3)
+    : [];
+
+  const haiku = {
+    id: toText(sourceHaiku.id || payload.id),
+    lines,
+    mood: toText(sourceHaiku.mood || payload.mood),
+    theme: toText(sourceHaiku.theme || payload.theme),
+    tags: Array.isArray(sourceHaiku.tags) ? sourceHaiku.tags.map(String) : []
+  };
+
+  return {
+    haiku,
+    lines,
+    text: toText(payload.text) || lines.join('\n'),
+    meta: toText(payload.meta) || [haiku.mood, haiku.theme].filter(Boolean).join(' · '),
+    notificationStyle: normalizeNotificationStyle(payload.notificationStyle)
+  };
+}
+
 function sendToRenderer(channel) {
   if (mainWindow && !mainWindow.isDestroyed()) {
     mainWindow.webContents.send(channel);
+    return true;
   }
+
+  return false;
 }
 
 function sendToRendererWithPayload(channel, payload) {
   if (mainWindow && !mainWindow.isDestroyed()) {
     mainWindow.webContents.send(channel, payload);
+    return true;
   }
+
+  return false;
 }
 
 function minutesToMilliseconds(minutes) {
@@ -142,6 +188,152 @@ function getScheduleState(date = new Date()) {
     isInQuietHours,
     isOutsideWorkHours: timeWindowSettings.workHoursOnly && !isInsideWorkHours
   };
+}
+
+function showNativeNotification(text) {
+  if (!Notification.isSupported()) return;
+
+  const notification = new Notification({
+    title: APP_NAME,
+    body: text,
+    silent: false
+  });
+
+  notification.on('click', showMainWindow);
+  notification.show();
+}
+
+function getFloatingPopupBounds() {
+  const { workArea } = screen.getPrimaryDisplay();
+  return {
+    x: Math.round(workArea.x + workArea.width - FLOATING_POPUP_WIDTH - FLOATING_POPUP_MARGIN),
+    y: Math.round(workArea.y + workArea.height - FLOATING_POPUP_HEIGHT - FLOATING_POPUP_MARGIN),
+    width: FLOATING_POPUP_WIDTH,
+    height: FLOATING_POPUP_HEIGHT
+  };
+}
+
+function positionFloatingPopup() {
+  if (!floatingPopupWindow || floatingPopupWindow.isDestroyed()) return;
+
+  const bounds = getFloatingPopupBounds();
+  floatingPopupWindow.setBounds(bounds, false);
+}
+
+function clearFloatingPopupTimers() {
+  if (floatingPopupTimer) {
+    clearTimeout(floatingPopupTimer);
+    floatingPopupTimer = null;
+  }
+
+  if (floatingPopupCloseTimer) {
+    clearTimeout(floatingPopupCloseTimer);
+    floatingPopupCloseTimer = null;
+  }
+}
+
+function closeFloatingPopup({ animate = true } = {}) {
+  if (!floatingPopupWindow || floatingPopupWindow.isDestroyed()) return;
+
+  clearFloatingPopupTimers();
+
+  if (animate) {
+    floatingPopupWindow.webContents.send('floating-haiku:dismiss');
+    floatingPopupCloseTimer = setTimeout(() => {
+      if (floatingPopupWindow && !floatingPopupWindow.isDestroyed()) {
+        floatingPopupWindow.close();
+      }
+    }, 220);
+    return;
+  }
+
+  floatingPopupWindow.close();
+}
+
+function scheduleFloatingPopupDismiss() {
+  if (floatingPopupTimer) clearTimeout(floatingPopupTimer);
+  floatingPopupTimer = setTimeout(() => closeFloatingPopup(), FLOATING_POPUP_DURATION_MS);
+}
+
+function showFloatingPopupWindow() {
+  if (!floatingPopupWindow || floatingPopupWindow.isDestroyed()) return;
+
+  positionFloatingPopup();
+  floatingPopupWindow.setAlwaysOnTop(true, 'floating');
+  floatingPopupWindow.showInactive();
+  scheduleFloatingPopupDismiss();
+}
+
+function createFloatingPopupWindow() {
+  const bounds = getFloatingPopupBounds();
+
+  floatingPopupWindow = new BrowserWindow({
+    ...bounds,
+    frame: false,
+    transparent: true,
+    resizable: false,
+    movable: false,
+    minimizable: false,
+    maximizable: false,
+    fullscreenable: false,
+    skipTaskbar: true,
+    show: false,
+    focusable: false,
+    alwaysOnTop: true,
+    hasShadow: true,
+    acceptFirstMouse: true,
+    backgroundColor: '#00000000',
+    webPreferences: {
+      preload: path.join(__dirname, 'popupPreload.js'),
+      contextIsolation: true,
+      nodeIntegration: false
+    }
+  });
+
+  floatingPopupWindow.setVisibleOnAllWorkspaces(false);
+  floatingPopupWindow.loadFile(path.join(__dirname, 'popup.html'));
+
+  floatingPopupWindow.once('ready-to-show', () => {
+    floatingPopupWindow.webContents.send('floating-haiku:data', floatingPopupData);
+    showFloatingPopupWindow();
+  });
+
+  floatingPopupWindow.on('closed', () => {
+    clearFloatingPopupTimers();
+    floatingPopupWindow = null;
+    floatingPopupData = null;
+  });
+}
+
+function showFloatingHaikuCard(payload, now = Date.now()) {
+  const scheduleState = getScheduleState(new Date(now));
+  if (scheduleState.isInQuietHours) return;
+
+  const data = normalizeHaikuNotificationPayload(payload);
+  if (!data.lines.length) return;
+
+  floatingPopupData = data;
+
+  if (floatingPopupWindow && !floatingPopupWindow.isDestroyed()) {
+    floatingPopupWindow.webContents.send('floating-haiku:data', floatingPopupData);
+    showFloatingPopupWindow();
+    return;
+  }
+
+  createFloatingPopupWindow();
+}
+
+function showHaikuNotification(payload) {
+  const data = normalizeHaikuNotificationPayload(payload);
+  if (!data.lines.length) return;
+
+  if (data.notificationStyle === 'native' || data.notificationStyle === 'both') {
+    showNativeNotification(data.text.replace(/\n/g, ' / '));
+  }
+
+  if (data.notificationStyle === 'floating' || data.notificationStyle === 'both') {
+    showFloatingHaikuCard(data);
+  }
 }
 
 // Timing lives in the main process because only Electron's main side can
@@ -370,16 +562,36 @@ ipcMain.on('close-window', () => {
 });
 
 ipcMain.on('show-native-notification', (_event, text) => {
-  if (!Notification.isSupported()) return;
+  showNativeNotification(String(text || ''));
+});
 
-  const notification = new Notification({
-    title: APP_NAME,
-    body: text,
-    silent: false
-  });
+ipcMain.on('haiku:notify', (_event, payload) => {
+  showHaikuNotification(payload);
+});
 
-  notification.on('click', showMainWindow);
-  notification.show();
+ipcMain.handle('floating-haiku:get-data', () => {
+  return floatingPopupData;
+});
+
+ipcMain.handle('floating-haiku:save', () => {
+  if (!floatingPopupData || !floatingPopupData.haiku) {
+    return { ok: false };
+  }
+
+  return { ok: sendToRendererWithPayload('floating-haiku:save', floatingPopupData.haiku) };
+});
+
+ipcMain.handle('floating-haiku:copy', () => {
+  if (!floatingPopupData || !floatingPopupData.text) {
+    return { ok: false };
+  }
+
+  clipboard.writeText(floatingPopupData.text);
+  return { ok: true };
+});
+
+ipcMain.on('floating-haiku:close', () => {
+  closeFloatingPopup();
 });
 
 ipcMain.on('update-interval', (_event, minutes) => {
@@ -460,4 +672,5 @@ app.on('activate', () => {
 app.on('before-quit', () => {
   app.isQuitting = true;
   stopSchedulerLoop();
+  closeFloatingPopup({ animate: false });
 });

@@ -6,6 +6,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   minimize: () => ipcRenderer.send('minimize-window'),
   close: () => ipcRenderer.send('close-window'),
   showNativeNotification: (text) => ipcRenderer.send('show-native-notification', text),
+  showHaikuNotification: (payload) => ipcRenderer.send('haiku:notify', payload),
   updateInterval: (min) => ipcRenderer.send('update-interval', min),
   resetTimer: () => ipcRenderer.send('reset-timer'),
   getSchedulerSnapshot: () => ipcRenderer.invoke('scheduler:get-snapshot'),
@@ -31,5 +32,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
     const listener = (_event, snapshot) => cb(snapshot);
     ipcRenderer.on('scheduler:snapshot', listener);
     return () => ipcRenderer.removeListener('scheduler:snapshot', listener);
+  },
+  onFloatingHaikuSave: (cb) => {
+    const listener = (_event, haiku) => cb(haiku);
+    ipcRenderer.on('floating-haiku:save', listener);
+    return () => ipcRenderer.removeListener('floating-haiku:save', listener);
   }
 });

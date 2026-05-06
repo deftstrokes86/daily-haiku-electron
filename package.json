@@ -35,9 +35,12 @@
     "files": [
       "main.js",
       "preload.js",
+      "popupPreload.js",
       "index.html",
+      "popup.html",
       "src/data/**/*.json",
       "src/renderer/**/*.js",
+      "src/popup/**/*",
       "src/scheduler/**/*.js",
       "package.json"
     ]
