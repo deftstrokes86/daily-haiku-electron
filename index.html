@@ -9,11 +9,12 @@
 </script>
 <style>
   :root {
-    --bg:#1a1714;--bg-el:#242019;--card:#2c2720;--card-h:#352f27;
-    --bdr:#3d362c;--bdr-l:#4a4236;--fg:#f0e8da;--fg-m:#a89b88;
-    --fg-d:#7a6f60;--accent:#d4a04a;--accent-g:rgba(212,160,74,0.15);
-    --accent-s:#c4914a;--red:#c45c4a;--green:#6a9e5c;--titlebar:#2c2720;
-    --r:8px;
+    --bg:#15120f;--bg-el:#211c17;--card:#272119;--card-h:#31291f;
+    --paper:#332b20;--paper-l:#3a3024;--ink:#f5ecdc;--bdr:#453a2c;
+    --bdr-l:#5b4c39;--fg:#f2e9dc;--fg-m:#baa98f;--fg-d:#86745d;
+    --accent:#d6aa62;--accent-g:rgba(214,170,98,0.16);--accent-s:#b98345;
+    --mood:#d6aa62;--mood-rgb:214,170,98;--red:#c45c4a;--green:#7fa36b;
+    --titlebar:rgba(31,26,20,.72);--r:8px;--progress-deg:0deg;
   }
   *{margin:0;padding:0;box-sizing:border-box}
   body{
@@ -276,10 +277,287 @@
   .toast.show{transform:translateX(0)}
   .toast i{color:var(--accent)}
 
+  /* Premium ritual refresh */
+  body{
+    background:var(--bg);
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+  .wallpaper{
+    background:
+      linear-gradient(155deg,rgba(255,237,202,.05),transparent 34%),
+      linear-gradient(25deg,rgba(var(--mood-rgb),.09),transparent 42%),
+      repeating-linear-gradient(90deg,rgba(255,255,255,.018) 0 1px,transparent 1px 7px),
+      repeating-linear-gradient(0deg,rgba(0,0,0,.035) 0 1px,transparent 1px 11px),
+      var(--bg);
+  }
+  .wallpaper::before{
+    content:'';position:absolute;inset:0;
+    background:
+      linear-gradient(180deg,rgba(255,242,213,.035),transparent 45%,rgba(0,0,0,.18)),
+      repeating-linear-gradient(118deg,rgba(255,255,255,.026) 0 1px,transparent 1px 16px);
+    opacity:.72;
+  }
+  .wallpaper::after{
+    content:'';position:absolute;inset:0;
+    background-image:
+      repeating-linear-gradient(18deg,rgba(255,255,255,.014) 0 1px,transparent 1px 5px),
+      repeating-linear-gradient(96deg,rgba(0,0,0,.035) 0 1px,transparent 1px 9px);
+    mix-blend-mode:soft-light;
+    opacity:.58;
+  }
+  .titlebar{
+    height:38px;
+    background:rgba(24,20,16,.62);
+    border-bottom:1px solid rgba(214,170,98,.12);
+    backdrop-filter:blur(18px);
+  }
+  .tb-title{font-size:11px;color:rgba(242,233,220,.68);letter-spacing:.2px}
+  .tb-title i{color:var(--mood);opacity:.9}
+  .tb-tabs{align-items:center;gap:4px;padding-right:8px}
+  .tb-tab{
+    height:29px;
+    padding:0 11px;
+    border:1px solid transparent;
+    border-radius:999px;
+    color:rgba(242,233,220,.48);
+    letter-spacing:.2px;
+  }
+  .tb-tab:hover{background:rgba(255,255,255,.035);color:rgba(242,233,220,.76)}
+  .tb-tab.active{
+    color:var(--fg);
+    background:rgba(var(--mood-rgb),.09);
+    border-color:rgba(var(--mood-rgb),.22);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+  }
+  .tb-winctrl .wb{width:42px;color:rgba(242,233,220,.56)}
+  .tp .ps{background:linear-gradient(180deg,rgba(255,255,255,.012),transparent 26%)}
+  .ps::-webkit-scrollbar-thumb{background:rgba(214,170,98,.18)}
+  .hh{
+    margin:34px 34px 22px;
+    padding:44px 34px 36px;
+    min-height:300px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    border:1px solid rgba(232,203,157,.16);
+    border-radius:8px;
+    overflow:hidden;
+    background:
+      linear-gradient(180deg,rgba(255,246,226,.085),rgba(255,246,226,.026)),
+      linear-gradient(135deg,rgba(var(--mood-rgb),.12),transparent 38%),
+      repeating-linear-gradient(92deg,rgba(255,255,255,.027) 0 1px,transparent 1px 9px),
+      repeating-linear-gradient(4deg,rgba(0,0,0,.034) 0 1px,transparent 1px 13px),
+      var(--paper);
+    box-shadow:
+      0 28px 70px rgba(0,0,0,.28),
+      0 0 0 1px rgba(255,255,255,.025) inset,
+      0 0 46px rgba(var(--mood-rgb),.07);
+    animation:paperBreath 9s ease-in-out infinite;
+  }
+  .hh::before{
+    top:0;left:22px;right:22px;transform:none;width:auto;height:1px;
+    background:linear-gradient(90deg,transparent,rgba(var(--mood-rgb),.7),transparent);
+    opacity:.8;
+  }
+  .hh::after{
+    content:'';position:absolute;inset:18px;
+    border:1px solid rgba(255,245,225,.055);
+    border-radius:6px;
+    pointer-events:none;
+  }
+  .hh-label{
+    position:relative;z-index:1;
+    margin-bottom:30px;
+    color:rgba(242,233,220,.46);
+    font-size:10px;
+    letter-spacing:3.8px;
+  }
+  .ht{
+    position:relative;z-index:1;
+    max-width:560px;
+    margin-bottom:30px;
+    color:var(--ink);
+    font-family:Georgia,'Times New Roman',serif;
+    font-size:32px;
+    line-height:1.72;
+    font-style:italic;
+    letter-spacing:0;
+    text-shadow:0 1px 0 rgba(255,255,255,.04),0 12px 32px rgba(0,0,0,.24);
+  }
+  .ht .ln{animation:lineFadeUp .72s cubic-bezier(.16,1,.3,1) forwards}
+  .hm{
+    position:relative;z-index:1;
+    max-width:100%;
+    flex-wrap:wrap;
+    row-gap:8px;
+    color:rgba(242,233,220,.42);
+    letter-spacing:.9px;
+  }
+  .hm .dt{background:rgba(var(--mood-rgb),.5)}
+  .ha{padding:0 34px 22px;gap:10px}
+  .ab{
+    min-height:38px;
+    border-color:rgba(232,203,157,.14);
+    background:rgba(39,33,25,.68);
+    color:rgba(242,233,220,.7);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
+    backdrop-filter:blur(12px);
+  }
+  .ab:hover{
+    border-color:rgba(var(--mood-rgb),.32);
+    color:var(--fg);
+    background:rgba(49,41,31,.76);
+  }
+  .ab.pr{
+    background:linear-gradient(180deg,rgba(var(--mood-rgb),.95),rgba(var(--mood-rgb),.76));
+    border-color:rgba(var(--mood-rgb),.75);
+    color:#19130c;
+  }
+  .ab.pr:hover{background:linear-gradient(180deg,var(--mood),rgba(var(--mood-rgb),.82));border-color:var(--mood)}
+  .ab.fav{border-color:rgba(var(--mood-rgb),.52);color:var(--mood)}
+  .dvd{margin:0 34px;background:rgba(232,203,157,.11)}
+  .hs{padding:16px 34px 20px}
+  .st{color:rgba(242,233,220,.38);letter-spacing:2.4px}
+  .hl{gap:7px}
+  .hi{
+    padding:9px 12px;
+    background:rgba(39,33,25,.34);
+    border-color:rgba(232,203,157,.06);
+    color:rgba(242,233,220,.58);
+    font-size:14px;
+  }
+  .hi:hover{background:rgba(49,41,31,.5);border-color:rgba(var(--mood-rgb),.22);color:rgba(242,233,220,.84)}
+  .hi .tm{color:rgba(242,233,220,.34)}
+  .history-empty{
+    padding:14px 12px;
+    color:rgba(242,233,220,.42);
+    font-family:Georgia,'Times New Roman',serif;
+    font-size:15px;
+    font-style:italic;
+  }
+  .cb{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    padding:17px 34px;
+    background:rgba(27,23,18,.72);
+    border-top:1px solid rgba(232,203,157,.12);
+    backdrop-filter:blur(18px);
+  }
+  .ring{
+    --ring-size:74px;
+    position:relative;
+    width:var(--ring-size);
+    height:var(--ring-size);
+    border-radius:50%;
+    flex:0 0 var(--ring-size);
+    display:grid;
+    place-items:center;
+    background:
+      conic-gradient(var(--mood) var(--progress-deg),rgba(255,246,226,.11) 0),
+      linear-gradient(180deg,rgba(255,255,255,.05),rgba(0,0,0,.1));
+    box-shadow:0 12px 28px rgba(0,0,0,.24),0 0 24px rgba(var(--mood-rgb),.12);
+    transition:background .9s linear;
+  }
+  .ring::before{
+    content:'';
+    position:absolute;
+    width:62px;
+    height:62px;
+    border-radius:50%;
+    background:rgba(21,18,15,.86);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
+  }
+  .ring-core{
+    position:relative;z-index:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    line-height:1.05;
+  }
+  .ring-core span{font-size:15px;font-weight:650;color:var(--fg)}
+  .ring-core small{font-size:9px;text-transform:uppercase;letter-spacing:1.1px;color:rgba(242,233,220,.38)}
+  .countdown-copy{min-width:0;flex:1}
+  .cl{
+    margin-bottom:5px;
+    color:rgba(242,233,220,.48);
+    letter-spacing:1.6px;
+  }
+  .cl .pu{background:var(--mood);box-shadow:0 0 14px rgba(var(--mood-rgb),.55)}
+  .ct{
+    margin-top:0;
+    margin-bottom:10px;
+    text-align:left;
+    color:rgba(242,233,220,.66);
+    font-size:13px;
+  }
+  .cp{height:4px;background:rgba(255,246,226,.11);border-radius:999px}
+  .cf{
+    background:linear-gradient(90deg,rgba(var(--mood-rgb),.52),var(--mood));
+    border-radius:999px;
+    transition:width .8s linear;
+  }
+  .sc{padding:30px 34px 34px;gap:22px}
+  .sg{
+    gap:9px;
+    padding-bottom:18px;
+    border-bottom:1px solid rgba(232,203,157,.09);
+  }
+  .sg:last-child{border-bottom:0}
+  .sl{font-size:14px;color:rgba(242,233,220,.9)}
+  .sl i{color:var(--mood)}
+  .sd{font-size:12.5px;line-height:1.55;color:rgba(242,233,220,.46)}
+  .cs,.time-input{
+    min-height:38px;
+    background:rgba(21,18,15,.5);
+    border-color:rgba(232,203,157,.14);
+    color:var(--fg);
+  }
+  .cs:hover,.cs:focus,.time-input:hover,.time-input:focus{border-color:rgba(var(--mood-rgb),.36)}
+  .day{background:rgba(21,18,15,.45);border-color:rgba(232,203,157,.14);color:rgba(242,233,220,.5)}
+  .day.on{border-color:rgba(var(--mood-rgb),.52);background:rgba(var(--mood-rgb),.13);color:var(--fg)}
+  .tg{background:rgba(255,246,226,.16)}
+  .tg.on{background:var(--mood)}
+  .ib{
+    background:rgba(var(--mood-rgb),.08);
+    border-color:rgba(var(--mood-rgb),.18);
+    color:rgba(242,233,220,.66);
+  }
+  .ib i{color:var(--mood)}
+  .as{box-shadow:0 6px 18px rgba(0,0,0,.22)}
+  .fc{padding:30px 34px}
+  .fe{padding:88px 20px;color:rgba(242,233,220,.42)}
+  .fe i{font-size:34px;color:rgba(var(--mood-rgb),.34)}
+  .fe p{
+    font-family:Georgia,'Times New Roman',serif;
+    font-size:17px;
+    line-height:1.8;
+    font-style:italic;
+    color:rgba(242,233,220,.58);
+  }
+  .fi{background:rgba(39,33,25,.5);border-color:rgba(232,203,157,.08)}
+  .fi:hover{border-color:rgba(var(--mood-rgb),.24)}
+  .toast{
+    background:rgba(39,33,25,.9);
+    border-color:rgba(var(--mood-rgb),.24);
+    backdrop-filter:blur(18px);
+  }
+  .toast i{color:var(--mood)}
+  @keyframes lineFadeUp{to{opacity:1;transform:translateY(0)}}
+  @keyframes paperBreath{
+    0%,100%{box-shadow:0 28px 70px rgba(0,0,0,.28),0 0 0 1px rgba(255,255,255,.025) inset,0 0 38px rgba(var(--mood-rgb),.055)}
+    50%{box-shadow:0 30px 78px rgba(0,0,0,.31),0 0 0 1px rgba(255,255,255,.03) inset,0 0 54px rgba(var(--mood-rgb),.105)}
+  }
+
   @media(prefers-reduced-motion:reduce){
     .ht .ln{animation:none;opacity:1;transform:none}
     .particle{animation:none;display:none}
     .cl .pu{animation:none}
+    .hh{animation:none}
+    .ring,.cf,.tb-tab,.ab,.hi{transition:none}
   }
 </style>
 </head>
@@ -339,9 +617,17 @@
       </div>
     </div>
     <div class="cb">
-      <div class="cl"><span class="pu"></span><span id="countdownStatus">Next haiku in</span></div>
-      <div class="cp"><div class="cf" id="countdownFill"></div></div>
-      <div class="ct" id="countdownTime"></div>
+      <div class="ring" id="countdownRing" aria-hidden="true">
+        <div class="ring-core">
+          <span id="ringValue">0%</span>
+          <small>active</small>
+        </div>
+      </div>
+      <div class="countdown-copy">
+        <div class="cl"><span class="pu"></span><span id="countdownStatus">Next haiku in</span></div>
+        <div class="ct" id="countdownTime"></div>
+        <div class="cp"><div class="cf" id="countdownFill"></div></div>
+      </div>
     </div>
   </div>
 
@@ -459,6 +745,47 @@ const DEFAULT_TIME_WINDOW_SETTINGS={
   workdayEnd:'17:00',
   workdays:[1,2,3,4,5]
 };
+const MOOD_ACCENTS={
+  default:['#d6aa62','214,170,98'],
+  calm:['#89a891','137,168,145'],
+  peaceful:['#89a891','137,168,145'],
+  quiet:['#89a891','137,168,145'],
+  gentle:['#89a891','137,168,145'],
+  reflective:['#89a891','137,168,145'],
+  clear:['#89a891','137,168,145'],
+  resolve:['#d39a5f','211,154,95'],
+  courage:['#d39a5f','211,154,95'],
+  brave:['#d39a5f','211,154,95'],
+  bold:['#d39a5f','211,154,95'],
+  fierce:['#d39a5f','211,154,95'],
+  determined:['#d39a5f','211,154,95'],
+  powerful:['#d39a5f','211,154,95'],
+  ambitious:['#d39a5f','211,154,95'],
+  hopeful:['#d6aa62','214,170,98'],
+  uplifted:['#d6aa62','214,170,98'],
+  encouraged:['#d6aa62','214,170,98'],
+  reassuring:['#d6aa62','214,170,98'],
+  grateful:['#d6aa62','214,170,98'],
+  light:['#d6aa62','214,170,98'],
+  warm:['#d6aa62','214,170,98'],
+  steady:['#aaa16f','170,161,111'],
+  grounded:['#aaa16f','170,161,111'],
+  steadfast:['#aaa16f','170,161,111'],
+  patient:['#aaa16f','170,161,111'],
+  satisfied:['#aaa16f','170,161,111'],
+  healing:['#c58b75','197,139,117'],
+  comforted:['#c58b75','197,139,117'],
+  connected:['#c58b75','197,139,117'],
+  open:['#c58b75','197,139,117'],
+  affirming:['#c58b75','197,139,117'],
+  inspired:['#7ea7a5','126,167,165']
+};
+function applyMoodAccent(mood){
+  const key=String(mood||'').toLowerCase();
+  const accent=MOOD_ACCENTS[key]||MOOD_ACCENTS.default;
+  document.documentElement.style.setProperty('--mood',accent[0]);
+  document.documentElement.style.setProperty('--mood-rgb',accent[1]);
+}
 
 // ===================== STATE =====================
 let S={cur:null,idx:-1,history:[],favs:[],interval:60,popup:true,sound:true,shownHaikuIds:[],timeWindowSettings:{...DEFAULT_TIME_WINDOW_SETTINGS}};
@@ -507,6 +834,7 @@ function haikuRecord(h,i){
 function display(h,i,anim){
   if(!h)return;
   S.cur=h;S.idx=i;
+  applyMoodAccent(h.mood);
   const c=document.getElementById('haikuText');
   c.innerHTML=HE.getHaikuLines(h).map(l=>`<span class="ln${anim?'':' na'}">${l}</span>`).join('');
   document.getElementById('haikuDate').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
@@ -550,14 +878,16 @@ function legacyHaiku(i){return HE.findHaikuByLegacyRef(haikus,i)}
 function entryText(x){return x.t||(legacyHaiku(x.i)?HE.getHaikuText(legacyHaiku(x.i)):'')}
 function updFavs(){
   const c=document.getElementById('favContent');
-  if(!S.favs.length){c.innerHTML='<div class="fe"><i class="fa-regular fa-bookmark"></i><p>No saved haikus yet.<br>Click the heart on any haiku to save it here.</p></div>';return}
+  if(!S.favs.length){c.innerHTML='<div class="fe"><i class="fa-regular fa-bookmark"></i><p>The shelf is quiet.<br>Save a haiku when one finds you.</p></div>';return}
   c.innerHTML='<div class="fl">'+S.favs.map((f,j)=>`<div class="fi"><div class="ft">${entryText(f).replace(/\n/g,'<br>')}</div><div class="fb"><span class="fv">${f.date||''} ${f.time||''}</span><button class="fr" onclick="rmFav(${j})" aria-label="Remove"><i class="fa-solid fa-xmark"></i></button></div></div>`).join('')+'</div>';
 }
 function rmFav(j){S.favs.splice(j,1);updFavBtn();updFavs();save();toast('Removed')}
 
 // ===================== HISTORY =====================
 function updHist(){
-  document.getElementById('historyList').innerHTML=S.history.slice(0,5).map((x,j)=>`<div class="hi" onclick="loadHist(${j})">${entryText(x).replace(/\n/g,'<br>')}<div class="tm">${x.time||''}</div></div>`).join('');
+  const list=document.getElementById('historyList');
+  if(!S.history.length){list.innerHTML='<div class="history-empty">No ink has settled here yet.</div>';return}
+  list.innerHTML=S.history.slice(0,5).map((x,j)=>`<div class="hi" onclick="loadHist(${j})">${entryText(x).replace(/\n/g,'<br>')}<div class="tm">${x.time||''}</div></div>`).join('');
 }
 function loadHist(j){const x=S.history[j],h=HE.findHaikuByLegacyRef(haikus,x&&x.id?x.id:x&&x.i),i=haikus.findIndex(v=>v.id===h?.id);if(h)display(h,i,true)}
 
@@ -573,6 +903,7 @@ function copyHaiku(){
 let lastCountdownStatus='';
 let lastCountdownText='';
 let lastCountdownWidth='';
+let lastRingText='';
 function resetMainTimer(){
   if(!window.electronAPI)return;
   if(window.electronAPI.resetScheduler)window.electronAPI.resetScheduler();
@@ -605,11 +936,17 @@ function setTextIfChanged(el,text,lastKey){
 function renderSchedulerSnapshot(snapshot){
   if(!snapshot)return;
   const fill=document.getElementById('countdownFill');
+  const ring=document.getElementById('countdownRing');
+  const ringValue=document.getElementById('ringValue');
   const time=document.getElementById('countdownTime');
   const status=document.getElementById('countdownStatus');
   const progress=Math.min(1,Math.max(0,Number(snapshot.progress||0)));
   const width=(progress*100).toFixed(1)+'%';
   if(width!==lastCountdownWidth){fill.style.width=width;lastCountdownWidth=width}
+  const deg=(progress*360).toFixed(1)+'deg';
+  ring.style.setProperty('--progress-deg',deg);
+  const ringText=Math.round(progress*100)+'%';
+  if(ringText!==lastRingText){ringValue.textContent=ringText;lastRingText=ringText}
   setTextIfChanged(status,schedulerStatusText(snapshot),'status');
   setTextIfChanged(time,formatRemaining(snapshot.remainingMs),'time');
 }
