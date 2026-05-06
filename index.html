@@ -552,6 +552,150 @@
     0%,100%{box-shadow:0 28px 70px rgba(0,0,0,.28),0 0 0 1px rgba(255,255,255,.025) inset,0 0 38px rgba(var(--mood-rgb),.055)}
     50%{box-shadow:0 30px 78px rgba(0,0,0,.31),0 0 0 1px rgba(255,255,255,.03) inset,0 0 54px rgba(var(--mood-rgb),.105)}
   }
+  .reflection-panel{
+    margin:0 34px 20px;
+    padding:14px 16px;
+    border:1px solid rgba(232,203,157,.1);
+    border-radius:8px;
+    background:rgba(39,33,25,.34);
+  }
+  .reflection-panel label,.archive-reflection label{
+    display:block;
+    margin-bottom:8px;
+    font-size:11px;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    color:rgba(242,233,220,.44);
+  }
+  .reflection-row{display:flex;gap:8px;align-items:center}
+  .reflection-input,.archive-search{
+    width:100%;
+    min-width:0;
+    height:38px;
+    padding:0 12px;
+    border:1px solid rgba(232,203,157,.14);
+    border-radius:6px;
+    background:rgba(21,18,15,.5);
+    color:var(--fg);
+    font-size:13px;
+    font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  }
+  .reflection-input::placeholder,.archive-search::placeholder{color:rgba(242,233,220,.32)}
+  .reflection-input:focus,.archive-search:focus{border-color:rgba(var(--mood-rgb),.38);outline:0}
+  .mini-link{
+    border:0;
+    background:transparent;
+    color:rgba(var(--mood-rgb),.9);
+    cursor:pointer;
+    font-size:11px;
+    letter-spacing:.5px;
+  }
+  .mini-link:hover{color:var(--fg)}
+  .archive-shell{padding:30px 34px 34px}
+  .archive-head{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:16px;
+    margin-bottom:18px;
+  }
+  .archive-kicker{
+    font-size:10px;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    color:rgba(242,233,220,.4);
+    margin-bottom:8px;
+  }
+  .archive-title{
+    font-family:Georgia,'Times New Roman',serif;
+    font-size:30px;
+    line-height:1.1;
+    font-style:italic;
+    color:var(--ink);
+  }
+  .archive-count{font-size:12px;color:rgba(242,233,220,.48);white-space:nowrap}
+  .archive-scopes{
+    display:flex;
+    flex-wrap:wrap;
+    gap:7px;
+    margin-bottom:14px;
+  }
+  .scope-btn{
+    height:31px;
+    padding:0 11px;
+    border:1px solid rgba(232,203,157,.12);
+    border-radius:999px;
+    background:rgba(39,33,25,.46);
+    color:rgba(242,233,220,.56);
+    cursor:pointer;
+    font-size:12px;
+  }
+  .scope-btn:hover{border-color:rgba(var(--mood-rgb),.28);color:var(--fg)}
+  .scope-btn.active{
+    border-color:rgba(var(--mood-rgb),.48);
+    background:rgba(var(--mood-rgb),.13);
+    color:var(--fg);
+  }
+  .archive-tools{
+    display:grid;
+    grid-template-columns:1fr 150px 150px;
+    gap:9px;
+    margin-bottom:18px;
+  }
+  .archive-list{display:flex;flex-direction:column;gap:12px}
+  .archive-card{
+    position:relative;
+    padding:18px 18px 16px;
+    border:1px solid rgba(232,203,157,.12);
+    border-radius:8px;
+    background:
+      linear-gradient(180deg,rgba(255,246,226,.045),rgba(255,246,226,.015)),
+      rgba(39,33,25,.48);
+    box-shadow:0 14px 34px rgba(0,0,0,.18);
+  }
+  .archive-lines{
+    font-family:Georgia,'Times New Roman',serif;
+    font-size:18px;
+    line-height:1.62;
+    font-style:italic;
+    color:var(--ink);
+    margin-bottom:10px;
+    cursor:pointer;
+  }
+  .archive-lines:hover{color:#fff7e8}
+  .archive-meta{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    align-items:center;
+    color:rgba(242,233,220,.43);
+    font-size:11px;
+    letter-spacing:.5px;
+    margin-bottom:13px;
+  }
+  .archive-pill{
+    border:1px solid rgba(var(--mood-rgb),.2);
+    border-radius:999px;
+    padding:3px 8px;
+    color:rgba(242,233,220,.58);
+  }
+  .archive-reflection{
+    padding-top:12px;
+    border-top:1px solid rgba(232,203,157,.09);
+  }
+  .archive-empty{
+    padding:74px 20px;
+    text-align:center;
+    color:rgba(242,233,220,.48);
+    font-family:Georgia,'Times New Roman',serif;
+    font-size:18px;
+    font-style:italic;
+    line-height:1.7;
+  }
+  @media(max-width:620px){
+    .archive-tools{grid-template-columns:1fr}
+    .archive-head{align-items:flex-start;flex-direction:column}
+  }
 
   @media(prefers-reduced-motion:reduce){
     .ht .ln{animation:none;opacity:1;transform:none}
@@ -583,6 +727,7 @@
     <div class="tb-title"><i class="fa-solid fa-feather-pointed"></i> Daily Haiku</div>
     <div class="tb-tabs">
       <div class="tb-tab active" data-tab="haiku" onclick="switchTab('haiku')"><i class="fa-solid fa-feather-pointed"></i> Haiku</div>
+      <div class="tb-tab" data-tab="archive" onclick="switchTab('archive')"><i class="fa-solid fa-database"></i> Archive</div>
       <div class="tb-tab" data-tab="favorites" onclick="switchTab('favorites')"><i class="fa-solid fa-bookmark"></i> Favorites</div>
       <div class="tb-tab" data-tab="settings" onclick="switchTab('settings')"><i class="fa-solid fa-gear"></i> Settings</div>
     </div>
@@ -611,9 +756,16 @@
         <button class="ab" onclick="copyHaiku()" aria-label="Copy"><i class="fa-regular fa-copy"></i><span>Copy</span></button>
         <button class="ab pr" onclick="newHaiku()" aria-label="New haiku"><i class="fa-solid fa-arrows-rotate"></i><span>New Haiku</span></button>
       </div>
+      <div class="reflection-panel">
+        <label for="currentReflection">What does this bring to mind?</label>
+        <div class="reflection-row">
+          <input class="reflection-input" id="currentReflection" maxlength="160" autocomplete="off" placeholder="A one-line reflection, if one arrives" oninput="updateCurrentReflection(this.value)">
+          <button class="mini-link" id="clearReflectionBtn" onclick="clearCurrentReflection()">Clear</button>
+        </div>
+      </div>
       <div class="dvd"></div>
       <div class="hs">
-        <div class="sh"><span class="st">Recent Haikus</span></div>
+        <div class="sh"><span class="st">Recent Haikus</span><button class="mini-link" onclick="switchTab('archive')">Open Archive</button></div>
         <div class="hl" id="historyList"></div>
       </div>
     </div>
@@ -628,6 +780,38 @@
         <div class="cl"><span class="pu"></span><span id="countdownStatus">Next haiku in</span></div>
         <div class="ct" id="countdownTime"></div>
         <div class="cp"><div class="cf" id="countdownFill"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Archive Panel -->
+  <div class="tp" id="panel-archive">
+    <div class="ps">
+      <div class="archive-shell">
+        <div class="archive-head">
+          <div>
+            <div class="archive-kicker">Personal Archive</div>
+            <div class="archive-title">Seen Haikus</div>
+          </div>
+          <div class="archive-count" id="archiveCount">0 entries</div>
+        </div>
+        <div class="archive-scopes" id="archiveScopes">
+          <button class="scope-btn active" data-scope="today" onclick="setArchiveScope('today')">Today</button>
+          <button class="scope-btn" data-scope="week" onclick="setArchiveScope('week')">This Week</button>
+          <button class="scope-btn" data-scope="month" onclick="setArchiveScope('month')">This Month</button>
+          <button class="scope-btn" data-scope="favorites" onclick="setArchiveScope('favorites')">Favorites</button>
+          <button class="scope-btn" data-scope="all" onclick="setArchiveScope('all')">All Seen</button>
+        </div>
+        <div class="archive-tools">
+          <input class="archive-search" id="archiveSearch" autocomplete="off" placeholder="Search text, mood, theme, or tag" oninput="updateArchiveSearch(this.value)">
+          <select class="cs" id="archiveMoodFilter" onchange="updateArchiveFilter('mood',this.value)">
+            <option value="">All moods</option>
+          </select>
+          <select class="cs" id="archiveThemeFilter" onchange="updateArchiveFilter('theme',this.value)">
+            <option value="">All themes</option>
+          </select>
+        </div>
+        <div class="archive-list" id="archiveList"></div>
       </div>
     </div>
   </div>
@@ -741,8 +925,10 @@
 <div class="toast" id="toast"><i class="fa-solid fa-check"></i><span id="toastTxt"></span></div>
 
 <script src="./src/renderer/haikuEngine.js"></script>
+<script src="./src/renderer/archiveEngine.js"></script>
 <script>
 const HE=window.DailyHaikuEngine;
+const AE=window.DailyHaikuArchive;
 let haikus=[];
 const DEFAULT_TIME_WINDOW_SETTINGS={
   quietHoursEnabled:false,
@@ -796,11 +982,19 @@ function applyMoodAccent(mood){
 }
 
 // ===================== STATE =====================
-let S={cur:null,idx:-1,history:[],favs:[],interval:60,popup:true,notificationStyle:'native',sound:true,shownHaikuIds:[],timeWindowSettings:{...DEFAULT_TIME_WINDOW_SETTINGS}};
+let S={
+  cur:null,idx:-1,currentArchiveEntryId:null,history:[],archiveEntries:[],archiveMigrated:false,
+  archiveView:{scope:'today',search:'',mood:'',theme:''},
+  favs:[],interval:60,popup:true,notificationStyle:'native',sound:true,shownHaikuIds:[],
+  timeWindowSettings:{...DEFAULT_TIME_WINDOW_SETTINGS}
+};
 
 function load(){
   try{const d=JSON.parse(localStorage.getItem('dhState')||'{}');
-    S.history=d.history||[];S.favs=d.favs||[];S.interval=d.interval||60;
+    S.history=d.history||[];S.archiveEntries=AE.normalizeArchiveEntries(d.archiveEntries||[]);
+    S.archiveMigrated=!!d.archiveMigrated;
+    S.archiveView={scope:'today',search:'',mood:'',theme:'',...(d.archiveView||{})};
+    S.favs=d.favs||[];S.interval=d.interval||60;
     S.shownHaikuIds=Array.isArray(d.shownHaikuIds)?d.shownHaikuIds:[];
     S.timeWindowSettings={...DEFAULT_TIME_WINDOW_SETTINGS,...(d.timeWindowSettings||{})};
     S.timeWindowSettings.workdays=Array.isArray(S.timeWindowSettings.workdays)?S.timeWindowSettings.workdays:[1,2,3,4,5];
@@ -809,7 +1003,8 @@ function load(){
 }
 function save(){
   try{localStorage.setItem('dhState',JSON.stringify({
-    history:S.history.slice(0,20),favs:S.favs,interval:S.interval,
+    history:S.history.slice(0,20),archiveEntries:S.archiveEntries,archiveMigrated:S.archiveMigrated,archiveView:S.archiveView,
+    favs:S.favs,interval:S.interval,
     popup:S.popup,notificationStyle:S.notificationStyle,sound:S.sound,shownHaikuIds:S.shownHaikuIds,
     timeWindowSettings:S.timeWindowSettings
   }))}catch(e){}
@@ -819,6 +1014,7 @@ function save(){
 function switchTab(t){
   document.querySelectorAll('.tb-tab').forEach(e=>e.classList.toggle('active',e.dataset.tab===t));
   document.querySelectorAll('.tp').forEach(e=>e.classList.toggle('active',e.id==='panel-'+t));
+  if(t==='archive')renderArchive();
 }
 
 // ===================== HAIKU LOGIC =====================
@@ -836,33 +1032,46 @@ function selectHaiku(){
   S.shownHaikuIds=r.queueState.shownIds;
   return{h:r.haiku,i:r.index};
 }
-function haikuRecord(h,i){
-  return{id:h.id,t:HE.getHaikuText(h),i,time:new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}),mood:h.mood,theme:h.theme};
+function haikuRecord(h,i,entry){
+  return{
+    entryId:entry.id,id:entry.haikuId,t:entry.lines.join('\n'),i,shownAt:entry.shownAt,source:entry.source,
+    time:new Date(entry.shownAt).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}),
+    mood:h.mood,theme:h.theme,reflection:entry.reflection
+  };
 }
-function display(h,i,anim){
+function recordHaikuDisplay(h,i,source){
+  const entry=AE.createArchiveEntry(h,{source});
+  S.archiveEntries=AE.normalizeArchiveEntries([entry,...S.archiveEntries]);
+  S.currentArchiveEntryId=entry.id;
+  S.history.unshift(haikuRecord(h,i,entry));
+  S.history=S.history.slice(0,8);
+  updHist();renderArchive();save();
+  return entry;
+}
+function display(h,i,anim,entryId){
   if(!h)return;
   S.cur=h;S.idx=i;
+  if(entryId!==undefined)S.currentArchiveEntryId=entryId;
   applyMoodAccent(h.mood);
   const c=document.getElementById('haikuText');
   c.innerHTML=HE.getHaikuLines(h).map(l=>`<span class="ln${anim?'':' na'}">${l}</span>`).join('');
   document.getElementById('haikuDate').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
   document.getElementById('haikuMeta').textContent=HE.getHaikuMeta(h);
   document.getElementById('haikuIndex').textContent=`Haiku ${i+1} of ${haikus.length}`;
-  updFavBtn();
+  updFavBtn();syncCurrentReflection();
 }
 function newHaiku(){
-  const{h,i}=selectHaiku();display(h,i,true);
+  const{h,i}=selectHaiku();
   if(!h)return;
-  S.history.unshift(haikuRecord(h,i));
-  S.history=S.history.slice(0,8);updHist();save();resetMainTimer();
+  const entry=recordHaikuDisplay(h,i,'manual');
+  display(h,i,true,entry.id);resetMainTimer();
 }
 function initHaiku(){
-  const{h,i}=selectHaiku();display(h,i,true);
-  if(h&&(!S.history.length||S.history[0].id!==h.id)){
-    S.history.unshift(haikuRecord(h,i));
-    S.history=S.history.slice(0,8);
-  }
-  updHist();updFavs();save();
+  const{h,i}=selectHaiku();
+  if(!h){updHist();updFavs();renderArchive();return}
+  const entry=recordHaikuDisplay(h,i,'manual');
+  display(h,i,true,entry.id);
+  updFavs();save();
 }
 
 // ===================== FAVORITES =====================
@@ -874,7 +1083,7 @@ function toggleFavorite(){
     time:new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}),
     date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'})});
     toast('Saved to favorites')}
-  updFavBtn();updFavs();save();
+  updFavBtn();updFavs();renderArchive();save();
 }
 function saveHaikuAsFavorite(h,showNotice=true){
   if(!h)return false;
@@ -888,7 +1097,7 @@ function saveHaikuAsFavorite(h,showNotice=true){
   S.favs.unshift({id:normalized.id,t:HE.getHaikuText(normalized),i:i>-1?i:undefined,mood:normalized.mood,theme:normalized.theme,
     time:new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}),
     date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'})});
-  updFavBtn();updFavs();save();
+  updFavBtn();updFavs();renderArchive();save();
   if(showNotice)toast('Saved to favorites');
   return true;
 }
@@ -905,15 +1114,113 @@ function updFavs(){
   if(!S.favs.length){c.innerHTML='<div class="fe"><i class="fa-regular fa-bookmark"></i><p>The shelf is quiet.<br>Save a haiku when one finds you.</p></div>';return}
   c.innerHTML='<div class="fl">'+S.favs.map((f,j)=>`<div class="fi"><div class="ft">${entryText(f).replace(/\n/g,'<br>')}</div><div class="fb"><span class="fv">${f.date||''} ${f.time||''}</span><button class="fr" onclick="rmFav(${j})" aria-label="Remove"><i class="fa-solid fa-xmark"></i></button></div></div>`).join('')+'</div>';
 }
-function rmFav(j){S.favs.splice(j,1);updFavBtn();updFavs();save();toast('Removed')}
+function rmFav(j){S.favs.splice(j,1);updFavBtn();updFavs();renderArchive();save();toast('Removed')}
 
 // ===================== HISTORY =====================
 function updHist(){
   const list=document.getElementById('historyList');
   if(!S.history.length){list.innerHTML='<div class="history-empty">No ink has settled here yet.</div>';return}
-  list.innerHTML=S.history.slice(0,5).map((x,j)=>`<div class="hi" onclick="loadHist(${j})">${entryText(x).replace(/\n/g,'<br>')}<div class="tm">${x.time||''}</div></div>`).join('');
+  list.innerHTML=S.history.slice(0,5).map((x,j)=>`<div class="hi" onclick="loadHist(${j})">${esc(entryText(x)).replace(/\n/g,'<br>')}<div class="tm">${x.time||''}</div></div>`).join('');
 }
-function loadHist(j){const x=S.history[j],h=HE.findHaikuByLegacyRef(haikus,x&&x.id?x.id:x&&x.i),i=haikus.findIndex(v=>v.id===h?.id);if(h)display(h,i,true)}
+function loadHist(j){
+  const x=S.history[j];
+  let entry=x&&x.entryId?S.archiveEntries.find(e=>e.id===x.entryId):null;
+  const h=entry?archiveEntryHaiku(entry):HE.findHaikuByLegacyRef(haikus,x&&x.id?x.id:x&&x.i);
+  if(!entry&&h)entry=S.archiveEntries.find(e=>e.haikuId===h.id&&e.lines.join('\n')===HE.getHaikuText(h))||null;
+  const i=haikus.findIndex(v=>v.id===h?.id);
+  if(h)display(h,i,true,entry?entry.id:null);
+}
+
+// ===================== ARCHIVE =====================
+function esc(v){return String(v||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function js(v){return JSON.stringify(String(v||''))}
+function title(v){return String(v||'').split(/[\s-]+/).filter(Boolean).map(p=>p[0].toUpperCase()+p.slice(1)).join(' ')}
+function favoriteIds(){return S.favs.map(f=>favId(f)).filter(Boolean)}
+function archiveEntryHaiku(entry){
+  return haikus.find(h=>h.id===entry.haikuId)||{id:entry.haikuId,lines:entry.lines,mood:entry.mood,theme:entry.theme,tags:entry.tags};
+}
+function migrateArchiveState(){
+  if(S.archiveMigrated)return;
+  S.archiveEntries=AE.migrateHistoryToArchive(S.history,haikus,S.archiveEntries);
+  S.archiveMigrated=true;
+  save();
+}
+function archiveDate(iso){
+  const d=new Date(iso);
+  if(Number.isNaN(d.getTime()))return'Unknown time';
+  return d.toLocaleDateString('en-US',{month:'short',day:'numeric'})+' at '+d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+}
+function renderArchiveFilters(){
+  const mood=document.getElementById('archiveMoodFilter'),theme=document.getElementById('archiveThemeFilter'),search=document.getElementById('archiveSearch');
+  if(!mood||!theme||!search)return;
+  const moodValue=S.archiveView.mood,themeValue=S.archiveView.theme;
+  mood.innerHTML='<option value="">All moods</option>'+AE.getUniqueValues(S.archiveEntries,'mood').map(v=>`<option value="${esc(v)}">${esc(title(v))}</option>`).join('');
+  theme.innerHTML='<option value="">All themes</option>'+AE.getUniqueValues(S.archiveEntries,'theme').map(v=>`<option value="${esc(v)}">${esc(title(v))}</option>`).join('');
+  mood.value=moodValue;theme.value=themeValue;search.value=S.archiveView.search||'';
+  document.querySelectorAll('.scope-btn').forEach(b=>b.classList.toggle('active',b.dataset.scope===S.archiveView.scope));
+}
+function renderArchive(){
+  const list=document.getElementById('archiveList'),count=document.getElementById('archiveCount');
+  if(!list||!count)return;
+  renderArchiveFilters();
+  const entries=AE.filterArchiveEntries(S.archiveEntries,{...S.archiveView,favoriteIds:favoriteIds()});
+  count.textContent=`${entries.length} entr${entries.length===1?'y':'ies'}`;
+  if(!entries.length){
+    const hasFilters=S.archiveView.search||S.archiveView.mood||S.archiveView.theme||S.archiveView.scope==='favorites';
+    list.innerHTML=`<div class="archive-empty">${hasFilters?'Nothing answers this quiet search.':'The archive is still blank.<br>Let a haiku find you first.'}</div>`;
+    return;
+  }
+  list.innerHTML=entries.map(entry=>{
+    const meta=[title(entry.mood),title(entry.theme)].filter(Boolean).join(' · ');
+    const tags=entry.tags&&entry.tags.length?`<span class="archive-pill">${esc(entry.tags.slice(0,3).join(' · '))}</span>`:'';
+    const source=entry.source==='scheduled'?'Scheduled':'Manual';
+    return `<div class="archive-card">
+      <div class="archive-lines" onclick="loadArchiveEntry(${js(entry.id)})">${esc(entry.lines.join('\n')).replace(/\n/g,'<br>')}</div>
+      <div class="archive-meta"><span>${esc(archiveDate(entry.shownAt))}</span><span class="archive-pill">${esc(source)}</span><span>${esc(meta)}</span>${tags}</div>
+      <div class="archive-reflection">
+        <label>What does this bring to mind?</label>
+        <div class="reflection-row">
+          <input class="reflection-input" maxlength="160" autocomplete="off" value="${esc(entry.reflection)}" placeholder="Optional one-line reflection" oninput="saveArchiveReflection(${js(entry.id)},this.value)">
+          <button class="mini-link" onclick="deleteArchiveReflection(${js(entry.id)})">Clear</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function setArchiveScope(scope){S.archiveView.scope=scope;renderArchive();save()}
+function updateArchiveSearch(value){S.archiveView.search=value;renderArchive();save()}
+function updateArchiveFilter(key,value){S.archiveView[key]=value;renderArchive();save()}
+function loadArchiveEntry(entryId){
+  const entry=S.archiveEntries.find(e=>e.id===entryId);
+  if(!entry)return;
+  const h=archiveEntryHaiku(entry),i=haikus.findIndex(v=>v.id===h.id);
+  display(h,i,true,entry.id);switchTab('haiku');
+}
+function updateEntryReflection(entryId,value,rerender){
+  S.archiveEntries=AE.updateReflection(S.archiveEntries,entryId,value);
+  S.history=S.history.map(item=>item.entryId===entryId?{...item,reflection:String(value||'').trim()}:item);
+  save();
+  if(rerender)renderArchive();
+  if(S.currentArchiveEntryId===entryId)syncCurrentReflection(false);
+}
+function saveArchiveReflection(entryId,value){updateEntryReflection(entryId,value,false)}
+function deleteArchiveReflection(entryId){updateEntryReflection(entryId,'',true);toast('Reflection cleared')}
+function syncCurrentReflection(setValue=true){
+  const input=document.getElementById('currentReflection'),clear=document.getElementById('clearReflectionBtn');
+  if(!input)return;
+  const entry=S.archiveEntries.find(e=>e.id===S.currentArchiveEntryId);
+  if(setValue)input.value=entry&&entry.reflection?entry.reflection:'';
+  if(clear)clear.style.visibility=entry&&entry.reflection?'visible':'hidden';
+}
+function updateCurrentReflection(value){
+  if(!S.currentArchiveEntryId)return;
+  updateEntryReflection(S.currentArchiveEntryId,value,false);
+}
+function clearCurrentReflection(){
+  const input=document.getElementById('currentReflection');
+  if(input)input.value='';
+  if(S.currentArchiveEntryId)deleteArchiveReflection(S.currentArchiveEntryId);
+}
 
 // ===================== COPY =====================
 function copyHaiku(){
@@ -975,10 +1282,10 @@ function renderSchedulerSnapshot(snapshot){
   setTextIfChanged(time,formatRemaining(snapshot.remainingMs),'time');
 }
 function triggerPopup(){
-  const{h,i}=selectHaiku();display(h,i,true);
+  const{h,i}=selectHaiku();
   if(!h)return;
-  S.history.unshift(haikuRecord(h,i));
-  S.history=S.history.slice(0,8);updHist();save();
+  const entry=recordHaikuDisplay(h,i,'scheduled');
+  display(h,i,true,entry.id);
   if(S.popup&&window.electronAPI){
     const payload={haiku:h,lines:HE.getHaikuLines(h),text:HE.getHaikuText(h),meta:HE.getHaikuMeta(h),notificationStyle:S.notificationStyle};
     if(window.electronAPI.showHaikuNotification)window.electronAPI.showHaikuNotification(payload);
@@ -1063,7 +1370,10 @@ function setAccent(el,c){
   document.querySelectorAll('.as').forEach(s=>s.classList.remove('sel'));
   el.classList.add('sel');localStorage.setItem('dhAccent',c);
 }
-function clearAllData(){S.favs=[];S.history=[];S.shownHaikuIds=[];updFavs();updHist();updFavBtn();save();toast('All data cleared')}
+function clearAllData(){
+  S.favs=[];S.history=[];S.archiveEntries=[];S.currentArchiveEntryId=null;S.archiveMigrated=true;S.shownHaikuIds=[];
+  updFavs();updHist();renderArchive();updFavBtn();syncCurrentReflection();save();toast('All data cleared')
+}
 
 // ===================== TOAST =====================
 let tto=null;
@@ -1105,12 +1415,13 @@ function wireElectron(){
 // ===================== KEYBOARD =====================
 document.addEventListener('keydown',e=>{
   if(!window.electronAPI)return;
-  if(e.target.tagName==='SELECT')return;
+  if(['SELECT','INPUT','TEXTAREA'].includes(e.target.tagName))return;
   if(e.key==='n'||e.key==='N')newHaiku();
   if(e.key==='f'||e.key==='F')toggleFavorite();
   if(e.key==='1')switchTab('haiku');
-  if(e.key==='2')switchTab('favorites');
-  if(e.key==='3')switchTab('settings');
+  if(e.key==='2')switchTab('archive');
+  if(e.key==='3')switchTab('favorites');
+  if(e.key==='4')switchTab('settings');
 });
 
 // ===================== INIT =====================
@@ -1118,6 +1429,7 @@ async function init(){
   if(!window.electronAPI)return;
   load();
   await loadHaikuData();
+  migrateArchiveState();
   document.getElementById('intervalSel').value=String(S.interval);
   document.getElementById('notificationStyleSel').value=S.notificationStyle;
   document.getElementById('popupTgl').classList.toggle('on',S.popup);
@@ -1131,7 +1443,7 @@ async function init(){
       s.classList.toggle('sel',bg===sa);
     });
   }
-  initHaiku();mkParticles();wireElectron();
+  renderArchive();initHaiku();mkParticles();wireElectron();
 }
 function rgb2hex(c){if(!c||c[0]==='#')return(c||'').toLowerCase();
   const m=c.match(/\d+/g);if(!m)return c;return'#'+m.slice(0,3).map(x=>(+x).toString(16).padStart(2,'0')).join('');}
