@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Motivational haiku desktop popup app for Windows",
   "author": "Daily Haiku",
-  "main": "main.js",
+  "main": "src/main/main.js",
   "scripts": {
     "start": "set ELECTRON_RUN_AS_NODE=& electron .",
     "test": "vitest run",
@@ -33,13 +33,10 @@
       "createStartMenuShortcut": true
     },
     "files": [
-      "main.js",
-      "preload.js",
-      "popupPreload.js",
-      "index.html",
-      "popup.html",
+      "src/main/**/*.js",
+      "src/preload/**/*.js",
+      "src/renderer/**/*",
       "src/data/**/*.json",
-      "src/renderer/**/*.js",
       "src/popup/**/*",
       "src/scheduler/**/*.js",
       "package.json"
