@@ -4,8 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Daily Haiku</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script>
+  if (!window.electronAPI) document.documentElement.classList.add('not-electron');
+</script>
 <style>
   :root {
     --bg:#1a1714;--bg-el:#242019;--card:#2c2720;--card-h:#352f27;
@@ -16,9 +17,50 @@
   }
   *{margin:0;padding:0;box-sizing:border-box}
   body{
-    font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--fg);
+    font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--fg);
     height:100vh;overflow:hidden;border-radius:var(--r);border:1px solid var(--bdr);
   }
+  .browser-guard{display:none}
+  html.not-electron body{border:0;border-radius:0}
+  html.not-electron .wallpaper,html.not-electron .particles,html.not-electron .app-shell,html.not-electron .toast{display:none}
+  html.not-electron .browser-guard{
+    min-height:100vh;display:flex;align-items:center;justify-content:center;
+    padding:32px;background:var(--bg);color:var(--fg);text-align:center;
+  }
+  .browser-guard-inner{max-width:480px}
+  .browser-guard-title{
+    font-family:Georgia,'Times New Roman',serif;font-size:32px;font-style:italic;
+    font-weight:400;margin-bottom:12px;color:var(--fg);
+  }
+  .browser-guard-text{font-size:14px;line-height:1.7;color:var(--fg-m);margin-bottom:18px}
+  .browser-guard-code{
+    display:inline-flex;padding:8px 12px;border:1px solid var(--bdr);
+    border-radius:6px;background:var(--card);font-family:Consolas,'Courier New',monospace;
+    font-size:13px;color:var(--accent);
+  }
+  .fa-solid,.fa-regular{
+    display:inline-flex;align-items:center;justify-content:center;
+    font-family:'Segoe UI Symbol','Segoe UI',sans-serif;font-style:normal;
+    font-weight:400;line-height:1;text-rendering:auto;
+  }
+  .fa-feather-pointed::before{content:"\2731"}
+  .fa-bookmark::before{content:"\25A3"}
+  .fa-gear::before{content:"\2699"}
+  .fa-minus::before{content:"\2212"}
+  .fa-xmark::before{content:"\00D7"}
+  .fa-heart::before{content:"\2661"}
+  .fa-solid.fa-heart::before{content:"\2665"}
+  .fa-copy::before{content:"\2398"}
+  .fa-arrows-rotate::before{content:"\21BB"}
+  .fa-circle-info::before{content:"i"}
+  .fa-clock::before{content:"\25F7"}
+  .fa-bell::before{content:"\25C9"}
+  .fa-volume-high::before{content:"\266A"}
+  .fa-palette::before{content:"\25C8"}
+  .fa-rocket::before{content:"\25B2"}
+  .fa-database::before{content:"\25A6"}
+  .fa-trash-can::before{content:"\232B"}
+  .fa-check::before{content:"\2713"}
 
   /* ── Background (fixed, below everything) ── */
   .wallpaper{
@@ -96,7 +138,7 @@
   }
   .hh-label{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--fg-d);margin-bottom:32px}
   .ht{
-    font-family:'Cormorant Garamond',serif;font-weight:300;font-style:italic;
+    font-family:Georgia,'Times New Roman',serif;font-weight:300;font-style:italic;
     font-size:26px;line-height:2;color:var(--fg);margin-bottom:28px;
   }
   .ht .ln{display:block;opacity:0;transform:translateY(12px);animation:lr .6s ease forwards}
@@ -113,7 +155,7 @@
   .ab{
     display:flex;align-items:center;gap:8px;padding:10px 20px;
     border:1px solid var(--bdr);background:var(--card);color:var(--fg-m);
-    border-radius:6px;cursor:pointer;font-size:12px;font-family:'DM Sans',sans-serif;
+    border-radius:6px;cursor:pointer;font-size:12px;font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
     transition:all .2s;
   }
   .ab:hover{border-color:var(--bdr-l);color:var(--fg);background:var(--card-h)}
@@ -132,11 +174,11 @@
   .hi{
     padding:10px 14px;background:var(--card);border:1px solid transparent;
     border-radius:6px;cursor:pointer;transition:all .2s;
-    font-family:'Cormorant Garamond',serif;font-size:15px;
+    font-family:Georgia,'Times New Roman',serif;font-size:15px;
     color:var(--fg-m);line-height:1.5;font-style:italic;
   }
   .hi:hover{border-color:var(--bdr);color:var(--fg);background:var(--card-h)}
-  .hi .tm{font-family:'DM Sans',sans-serif;font-size:10px;color:var(--fg-d);font-style:normal;margin-top:4px}
+  .hi .tm{font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:10px;color:var(--fg-d);font-style:normal;margin-top:4px}
 
   /* ── Countdown ── */
   .cb{padding:16px 44px;background:var(--card);border-top:1px solid var(--bdr);margin-top:auto}
@@ -156,7 +198,7 @@
   .sk{margin-left:26px}
   .cs{
     width:100%;padding:10px 14px;background:var(--card);border:1px solid var(--bdr);
-    border-radius:6px;color:var(--fg);font-size:13px;font-family:'DM Sans',sans-serif;
+    border-radius:6px;color:var(--fg);font-size:13px;font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
     cursor:pointer;appearance:none;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237a6f60' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
     background-repeat:no-repeat;background-position:right 12px center;transition:all .2s;
@@ -196,7 +238,7 @@
   .fl{display:flex;flex-direction:column;gap:8px}
   .fi{padding:14px 16px;background:var(--card);border:1px solid transparent;border-radius:6px;transition:all .2s}
   .fi:hover{border-color:var(--bdr)}
-  .fi .ft{font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--fg);line-height:1.6;font-style:italic}
+  .fi .ft{font-family:Georgia,'Times New Roman',serif;font-size:16px;color:var(--fg);line-height:1.6;font-style:italic}
   .fi .fb{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
   .fi .fv{font-size:10px;color:var(--fg-d)}
   .fr{
@@ -225,6 +267,13 @@
 </style>
 </head>
 <body>
+<div class="browser-guard">
+  <div class="browser-guard-inner">
+    <div class="browser-guard-title">Daily Haiku is a desktop app</div>
+    <div class="browser-guard-text">This file is the Electron renderer, not a standalone web page. Launch the app from the project folder with:</div>
+    <div class="browser-guard-code">npm.cmd start</div>
+  </div>
+</div>
 
 <!-- Fixed decorative layers (z-index: 0) -->
 <div class="wallpaper"></div>
@@ -447,7 +496,7 @@ function display(h,i,anim){
 function newHaiku(){
   const{h,i}=randHaiku(S.idx);display(h,i,true);
   S.history.unshift({t:h.text.join('\n'),i,time:new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})});
-  S.history=S.history.slice(0,8);updHist();save();resetCD();
+  S.history=S.history.slice(0,8);updHist();save();resetCD();resetMainTimer();
 }
 function initHaiku(){
   const{h,i}=dayHaiku();display(h,i,true);
@@ -498,18 +547,18 @@ function copyHaiku(){
 // ===================== COUNTDOWN =====================
 let cdStart=Date.now();
 function resetCD(){cdStart=Date.now();S.lastT=Date.now();save()}
+function resetMainTimer(){if(window.electronAPI)window.electronAPI.resetTimer()}
 function updCD(){
   const el=Date.now()-cdStart,tot=S.interval*6e4,rem=Math.max(0,tot-el);
   document.getElementById('countdownFill').style.width=Math.min(100,el/tot*100)+'%';
   const m=Math.floor(rem/6e4),s=Math.floor((rem%6e4)/1e3);
   document.getElementById('countdownTime').textContent=`${m}m ${String(s).padStart(2,'0')}s remaining`;
-  if(rem<=0&&S.popup){triggerPopup();cdStart=Date.now()}
 }
 function triggerPopup(){
   const{h,i}=randHaiku(S.idx);display(h,i,true);
   S.history.unshift({t:h.text.join('\n'),i,time:new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})});
   S.history=S.history.slice(0,8);updHist();save();
-  if(window.electronAPI)window.electronAPI.showNativeNotification(h.text.join(' / '));
+  if(S.popup&&window.electronAPI)window.electronAPI.showNativeNotification(h.text.join(' / '));
   if(S.sound)playChime();
 }
 
@@ -571,6 +620,7 @@ function wireElectron(){
   if(!window.electronAPI)return;
   document.getElementById('minBtn').addEventListener('click',()=>window.electronAPI.minimize());
   document.getElementById('closeBtn').addEventListener('click',()=>window.electronAPI.close());
+  window.electronAPI.updateInterval(S.interval);
   window.electronAPI.onTriggerPopup(()=>{triggerPopup();resetCD()});
   window.electronAPI.onOpenSettings(()=>switchTab('settings'));
   // Restore startup toggle state
@@ -581,6 +631,7 @@ function wireElectron(){
 
 // ===================== KEYBOARD =====================
 document.addEventListener('keydown',e=>{
+  if(!window.electronAPI)return;
   if(e.target.tagName==='SELECT')return;
   if(e.key==='n'||e.key==='N')newHaiku();
   if(e.key==='f'||e.key==='F')toggleFavorite();
@@ -591,6 +642,7 @@ document.addEventListener('keydown',e=>{
 
 // ===================== INIT =====================
 function init(){
+  if(!window.electronAPI)return;
   load();
   document.getElementById('intervalSel').value=String(S.interval);
   document.getElementById('popupTgl').classList.toggle('on',S.popup);
