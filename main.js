@@ -2,6 +2,12 @@ const { app, BrowserWindow, Tray, Menu, Notification, nativeImage, ipcMain, scre
 const fs = require('fs');
 const path = require('path');
 const { createActiveTimeScheduler } = require('./src/scheduler/activeTimeScheduler');
+const {
+  DEFAULT_TIME_WINDOW_SETTINGS,
+  isWithinQuietHours,
+  isWithinWorkHours,
+  normalizeTimeWindowSettings
+} = require('./src/scheduler/timeWindows');
 
 const APP_NAME = 'Daily Haiku';
 const APP_ID = 'com.dailyhaiku.app';
@@ -21,9 +27,9 @@ let scheduler = createActiveTimeScheduler({
 });
 let trackedEnvironmentState = {
   isSuspended: false,
-  isLocked: false,
-  isInQuietHours: false
+  isLocked: false
 };
+let timeWindowSettings = normalizeTimeWindowSettings(DEFAULT_TIME_WINDOW_SETTINGS);
 let haikuDataCache = null;
 
 app.setName(APP_NAME);
@@ -128,25 +134,39 @@ function getSystemIdleTimeMs() {
   }
 }
 
+function getScheduleState(date = new Date()) {
+  const isInQuietHours = isWithinQuietHours(date, timeWindowSettings);
+  const isInsideWorkHours = isWithinWorkHours(date, timeWindowSettings);
+
+  return {
+    isInQuietHours,
+    isOutsideWorkHours: timeWindowSettings.workHoursOnly && !isInsideWorkHours
+  };
+}
+
 // Timing lives in the main process because only Electron's main side can
 // reliably observe screen lock, system idle, and suspend/resume state. The
 // renderer can draw a countdown, but it should not decide when haikus fire.
-function getEnvironmentState() {
+function getEnvironmentState(now = Date.now()) {
   const idleState = getSystemIdleState();
   const idleTimeMs = getSystemIdleTimeMs();
   const isLocked = trackedEnvironmentState.isLocked || idleState === 'locked';
+  const scheduleState = getScheduleState(new Date(now));
 
   return {
     isLocked,
     isIdle: !isLocked && (idleState === 'idle' || idleTimeMs >= idleThresholdMs),
     isSuspended: trackedEnvironmentState.isSuspended,
-    isInQuietHours: trackedEnvironmentState.isInQuietHours
+    isInQuietHours: scheduleState.isInQuietHours,
+    isOutsideWorkHours: scheduleState.isOutsideWorkHours
   };
 }
 
 function getSchedulerSnapshot(now = Date.now()) {
   return {
     ...scheduler.getSnapshot(now),
+    ...getScheduleState(new Date(now)),
+    timeWindowSettings,
     currentIntervalMinutes,
     idleThresholdMs,
     tickMs: SCHEDULER_TICK_MS
@@ -158,7 +178,7 @@ function broadcastSchedulerSnapshot(now = Date.now()) {
 }
 
 function runSchedulerTick(now = Date.now()) {
-  const event = scheduler.tick(now, getEnvironmentState());
+  const event = scheduler.tick(now, getEnvironmentState(now));
 
   if (event && event.type === 'TRIGGER_HAIKU') {
     sendToRenderer('trigger-popup');
@@ -208,6 +228,13 @@ function setIdleThresholdMs(thresholdMs, now = Date.now()) {
   return getSchedulerSnapshot(now);
 }
 
+function updateTimeWindowSettings(settings, now = Date.now()) {
+  timeWindowSettings = normalizeTimeWindowSettings(settings);
+  scheduler.tick(now, getEnvironmentState(now));
+  broadcastSchedulerSnapshot(now);
+  return getSchedulerSnapshot(now);
+}
+
 function triggerHaikuNow(now = Date.now()) {
   resetScheduler(now);
   sendToRenderer('trigger-popup');
@@ -235,14 +262,14 @@ function markSchedulerInactive(now, key, reason) {
   runSchedulerTick(now);
   trackedEnvironmentState[key] = true;
   scheduler.pause(now, reason);
-  scheduler.tick(now, getEnvironmentState());
+  scheduler.tick(now, getEnvironmentState(now));
   broadcastSchedulerSnapshot(now);
 }
 
 function markSchedulerActive(now, key, reason) {
   trackedEnvironmentState[key] = false;
   scheduler.resume(now, reason);
-  scheduler.tick(now, getEnvironmentState());
+  scheduler.tick(now, getEnvironmentState(now));
   broadcastSchedulerSnapshot(now);
 }
 
@@ -377,6 +404,14 @@ ipcMain.handle('scheduler:reset', () => {
 
 ipcMain.handle('scheduler:set-idle-threshold', (_event, thresholdMs) => {
   return setIdleThresholdMs(thresholdMs);
+});
+
+ipcMain.handle('schedule:get-settings', () => {
+  return timeWindowSettings;
+});
+
+ipcMain.handle('schedule:update-settings', (_event, settings) => {
+  return updateTimeWindowSettings(settings);
 });
 
 ipcMain.on('toggle-autolaunch', (_event, enabled) => {

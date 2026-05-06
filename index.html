@@ -54,6 +54,8 @@
   .fa-arrows-rotate::before{content:"\21BB"}
   .fa-circle-info::before{content:"i"}
   .fa-clock::before{content:"\25F7"}
+  .fa-moon::before{content:"\25D0"}
+  .fa-briefcase::before{content:"\25A4"}
   .fa-bell::before{content:"\25C9"}
   .fa-volume-high::before{content:"\266A"}
   .fa-palette::before{content:"\25C8"}
@@ -205,6 +207,21 @@
   }
   .cs:hover,.cs:focus{border-color:var(--bdr-l);outline:0}
   .cs option{background:var(--card);color:var(--fg)}
+  .time-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
+  .time-field{display:flex;flex-direction:column;gap:5px}
+  .time-field span{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--fg-d)}
+  .time-input{
+    width:100%;padding:9px 10px;background:var(--card);border:1px solid var(--bdr);
+    border-radius:6px;color:var(--fg);font-size:13px;font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  }
+  .time-input:hover,.time-input:focus{border-color:var(--bdr-l);outline:0}
+  .days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:10px}
+  .day{
+    height:28px;border:1px solid var(--bdr);background:var(--card);color:var(--fg-d);
+    border-radius:6px;cursor:pointer;font-size:11px;transition:all .2s;
+  }
+  .day:hover{border-color:var(--bdr-l);color:var(--fg-m)}
+  .day.on{border-color:var(--accent);background:var(--accent-g);color:var(--accent)}
   .tr{display:flex;align-items:center;justify-content:space-between;padding:10px 0}
   .tg{
     width:44px;height:24px;background:var(--bdr);border-radius:12px;
@@ -355,6 +372,37 @@
           </div>
         </div>
         <div class="sg">
+          <div class="sl"><i class="fa-solid fa-moon"></i> Quiet Hours</div>
+          <div class="sd">Pause haikus during rest time</div>
+          <div class="sk">
+            <div class="tr"><span style="font-size:13px;color:var(--fg-m)">Quiet hours</span><button class="tg" id="quietTgl" onclick="toggleQuietHours()" aria-label="Toggle quiet hours"></button></div>
+            <div class="time-grid">
+              <label class="time-field"><span>Start</span><input class="time-input" type="time" id="quietStart" onchange="updateTimeWindowSetting('quietHoursStart',this.value)"></label>
+              <label class="time-field"><span>End</span><input class="time-input" type="time" id="quietEnd" onchange="updateTimeWindowSetting('quietHoursEnd',this.value)"></label>
+            </div>
+          </div>
+        </div>
+        <div class="sg">
+          <div class="sl"><i class="fa-solid fa-briefcase"></i> Work Hours</div>
+          <div class="sd">Only count active time during selected work windows</div>
+          <div class="sk">
+            <div class="tr"><span style="font-size:13px;color:var(--fg-m)">Work hours only</span><button class="tg" id="workOnlyTgl" onclick="toggleWorkHoursOnly()" aria-label="Toggle work hours only"></button></div>
+            <div class="time-grid">
+              <label class="time-field"><span>Start</span><input class="time-input" type="time" id="workStart" onchange="updateTimeWindowSetting('workdayStart',this.value)"></label>
+              <label class="time-field"><span>End</span><input class="time-input" type="time" id="workEnd" onchange="updateTimeWindowSetting('workdayEnd',this.value)"></label>
+            </div>
+            <div class="days" id="workdays">
+              <button class="day" data-day="1" onclick="toggleWorkday(1)">M</button>
+              <button class="day" data-day="2" onclick="toggleWorkday(2)">T</button>
+              <button class="day" data-day="3" onclick="toggleWorkday(3)">W</button>
+              <button class="day" data-day="4" onclick="toggleWorkday(4)">T</button>
+              <button class="day" data-day="5" onclick="toggleWorkday(5)">F</button>
+              <button class="day" data-day="6" onclick="toggleWorkday(6)">S</button>
+              <button class="day" data-day="0" onclick="toggleWorkday(0)">S</button>
+            </div>
+          </div>
+        </div>
+        <div class="sg">
           <div class="sl"><i class="fa-solid fa-bell"></i> Notifications</div>
           <div class="sd">Show native Windows notification when a new haiku arrives</div>
           <div class="sk"><div class="tr"><span style="font-size:13px;color:var(--fg-m)">Desktop notifications</span><button class="tg on" id="popupTgl" onclick="toggleSetting('popup')" aria-label="Toggle"></button></div></div>
@@ -402,21 +450,33 @@
 <script>
 const HE=window.DailyHaikuEngine;
 let haikus=[];
+const DEFAULT_TIME_WINDOW_SETTINGS={
+  quietHoursEnabled:false,
+  quietHoursStart:'22:00',
+  quietHoursEnd:'08:00',
+  workHoursOnly:false,
+  workdayStart:'09:00',
+  workdayEnd:'17:00',
+  workdays:[1,2,3,4,5]
+};
 
 // ===================== STATE =====================
-let S={cur:null,idx:-1,history:[],favs:[],interval:60,popup:true,sound:true,shownHaikuIds:[]};
+let S={cur:null,idx:-1,history:[],favs:[],interval:60,popup:true,sound:true,shownHaikuIds:[],timeWindowSettings:{...DEFAULT_TIME_WINDOW_SETTINGS}};
 
 function load(){
   try{const d=JSON.parse(localStorage.getItem('dhState')||'{}');
     S.history=d.history||[];S.favs=d.favs||[];S.interval=d.interval||60;
     S.shownHaikuIds=Array.isArray(d.shownHaikuIds)?d.shownHaikuIds:[];
+    S.timeWindowSettings={...DEFAULT_TIME_WINDOW_SETTINGS,...(d.timeWindowSettings||{})};
+    S.timeWindowSettings.workdays=Array.isArray(S.timeWindowSettings.workdays)?S.timeWindowSettings.workdays:[1,2,3,4,5];
     S.popup=d.popup!==false;S.sound=d.sound!==false;
   }catch(e){}
 }
 function save(){
   try{localStorage.setItem('dhState',JSON.stringify({
     history:S.history.slice(0,20),favs:S.favs,interval:S.interval,
-    popup:S.popup,sound:S.sound,shownHaikuIds:S.shownHaikuIds
+    popup:S.popup,sound:S.sound,shownHaikuIds:S.shownHaikuIds,
+    timeWindowSettings:S.timeWindowSettings
   }))}catch(e){}
 }
 
@@ -529,8 +589,9 @@ function formatRemaining(ms){
 function schedulerStatusText(snapshot){
   if(snapshot.isSuspended)return'Paused while system is suspended';
   if(snapshot.isLocked)return'Paused while screen is locked';
+  if(snapshot.isInQuietHours)return'Resting during quiet hours';
+  if(snapshot.isOutsideWorkHours)return'Waiting for your workday window';
   if(snapshot.isIdle)return'Paused while laptop is idle';
-  if(snapshot.isInQuietHours)return'Paused during quiet hours';
   if(snapshot.paused)return'Paused';
   return'Next haiku in';
 }
@@ -579,6 +640,42 @@ function updateInterval(){
   if(window.electronAPI)window.electronAPI.updateInterval(S.interval);
   toast(`Interval: every ${S.interval} minute${S.interval>1?'s':''}`);
 }
+function syncTimeWindowSettings(showToast){
+  save();
+  renderTimeWindowSettings();
+  if(window.electronAPI&&window.electronAPI.updateScheduleSettings){
+    window.electronAPI.updateScheduleSettings(S.timeWindowSettings).then(renderSchedulerSnapshot).catch(()=>{});
+  }
+  if(showToast)toast('Schedule updated');
+}
+function renderTimeWindowSettings(){
+  const w=S.timeWindowSettings;
+  document.getElementById('quietTgl').classList.toggle('on',!!w.quietHoursEnabled);
+  document.getElementById('quietStart').value=w.quietHoursStart;
+  document.getElementById('quietEnd').value=w.quietHoursEnd;
+  document.getElementById('workOnlyTgl').classList.toggle('on',!!w.workHoursOnly);
+  document.getElementById('workStart').value=w.workdayStart;
+  document.getElementById('workEnd').value=w.workdayEnd;
+  document.querySelectorAll('.day').forEach(b=>b.classList.toggle('on',w.workdays.includes(+b.dataset.day)));
+}
+function toggleQuietHours(){
+  S.timeWindowSettings.quietHoursEnabled=!S.timeWindowSettings.quietHoursEnabled;
+  syncTimeWindowSettings(true);
+}
+function toggleWorkHoursOnly(){
+  S.timeWindowSettings.workHoursOnly=!S.timeWindowSettings.workHoursOnly;
+  syncTimeWindowSettings(true);
+}
+function updateTimeWindowSetting(key,value){
+  S.timeWindowSettings[key]=value;
+  syncTimeWindowSettings(true);
+}
+function toggleWorkday(day){
+  const days=new Set(S.timeWindowSettings.workdays);
+  if(days.has(day))days.delete(day);else days.add(day);
+  S.timeWindowSettings.workdays=[...days].sort((a,b)=>a-b);
+  syncTimeWindowSettings(true);
+}
 function toggleSetting(t){
   if(t==='popup'){S.popup=!S.popup;document.getElementById('popupTgl').classList.toggle('on',S.popup)}
   else{S.sound=!S.sound;document.getElementById('soundTgl').classList.toggle('on',S.sound)}
@@ -623,6 +720,7 @@ function wireElectron(){
   window.electronAPI.onOpenSettings(()=>switchTab('settings'));
   if(window.electronAPI.onSchedulerSnapshot)window.electronAPI.onSchedulerSnapshot(renderSchedulerSnapshot);
   window.electronAPI.updateInterval(S.interval);
+  if(window.electronAPI.updateScheduleSettings)window.electronAPI.updateScheduleSettings(S.timeWindowSettings).then(renderSchedulerSnapshot).catch(()=>{});
   if(window.electronAPI.getSchedulerSnapshot){
     window.electronAPI.getSchedulerSnapshot().then(renderSchedulerSnapshot).catch(()=>{});
   }
@@ -651,6 +749,7 @@ async function init(){
   document.getElementById('intervalSel').value=String(S.interval);
   document.getElementById('popupTgl').classList.toggle('on',S.popup);
   document.getElementById('soundTgl').classList.toggle('on',S.sound);
+  renderTimeWindowSettings();
   const sa=localStorage.getItem('dhAccent');
   if(sa){document.documentElement.style.setProperty('--accent',sa);
     document.documentElement.style.setProperty('--accent-g',sa+'26');

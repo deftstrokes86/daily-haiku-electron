@@ -4,7 +4,8 @@ const DEFAULT_ENVIRONMENT_STATE = {
   isLocked: false,
   isIdle: false,
   isSuspended: false,
-  isInQuietHours: false
+  isInQuietHours: false,
+  isOutsideWorkHours: false
 };
 
 function normalizeTimestamp(value, label) {
@@ -32,7 +33,8 @@ function normalizeEnvironmentState(environmentState = {}) {
     isLocked: Boolean(environmentState.isLocked),
     isIdle: Boolean(environmentState.isIdle),
     isSuspended: Boolean(environmentState.isSuspended),
-    isInQuietHours: Boolean(environmentState.isInQuietHours)
+    isInQuietHours: Boolean(environmentState.isInQuietHours),
+    isOutsideWorkHours: Boolean(environmentState.isOutsideWorkHours)
   };
 }
 
@@ -59,7 +61,8 @@ function createActiveTimeScheduler(options = {}) {
       && !state.environmentState.isLocked
       && !state.environmentState.isIdle
       && !state.environmentState.isSuspended
-      && !state.environmentState.isInQuietHours;
+      && !state.environmentState.isInQuietHours
+      && !state.environmentState.isOutsideWorkHours;
   }
 
   function markActiveProgressStarted() {
@@ -127,6 +130,7 @@ function createActiveTimeScheduler(options = {}) {
       isIdle: state.environmentState.isIdle,
       isSuspended: state.environmentState.isSuspended,
       isInQuietHours: state.environmentState.isInQuietHours,
+      isOutsideWorkHours: state.environmentState.isOutsideWorkHours,
       isActivelyCountable: isActivelyCountable(),
       isReadyToTrigger: state.activeAccumulatedMs >= state.intervalMs && !state.hasEmittedForCurrentInterval,
       lastTriggeredAt: state.lastTriggeredAt,

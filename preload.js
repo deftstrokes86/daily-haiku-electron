@@ -12,6 +12,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   updateSchedulerInterval: (intervalMs) => ipcRenderer.invoke('scheduler:update-interval', intervalMs),
   resetScheduler: () => ipcRenderer.invoke('scheduler:reset'),
   setSchedulerIdleThreshold: (thresholdMs) => ipcRenderer.invoke('scheduler:set-idle-threshold', thresholdMs),
+  getScheduleSettings: () => ipcRenderer.invoke('schedule:get-settings'),
+  updateScheduleSettings: (settings) => ipcRenderer.invoke('schedule:update-settings', settings),
   toggleAutolaunch: (on) => ipcRenderer.send('toggle-autolaunch', on),
   getAutolaunch: () => ipcRenderer.invoke('get-autolaunch'),
   getHaikus: () => ipcRenderer.invoke('haikus:get-all'),
