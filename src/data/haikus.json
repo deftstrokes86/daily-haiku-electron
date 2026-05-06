@@ -1,0 +1,373 @@
+[
+  {
+    "id": "initiative-001",
+    "lines": ["Rise before the sun", "The quiet world is your canvas", "Paint your own path now"],
+    "mood": "resolve",
+    "theme": "initiative",
+    "tags": ["focus", "creativity", "beginning"]
+  },
+  {
+    "id": "resilience-001",
+    "lines": ["Fall seven times", "Stand up eight with strong heart", "Strength lives in trying"],
+    "mood": "courage",
+    "theme": "resilience",
+    "tags": ["persistence", "recovery", "strength"]
+  },
+  {
+    "id": "discipline-001",
+    "lines": ["Small steps each day", "Mountains move beneath your feet", "Keep walking forward"],
+    "mood": "courage",
+    "theme": "discipline",
+    "tags": ["growth", "resilience", "consistency"]
+  },
+  {
+    "id": "steadiness-001",
+    "lines": ["Storm clouds may gather", "Your inner light burns steady", "Rain cannot dim you"],
+    "mood": "steady",
+    "theme": "inner strength",
+    "tags": ["storm", "confidence", "endurance"]
+  },
+  {
+    "id": "patience-001",
+    "lines": ["Seed in dark soil", "Trust the unseen growth within", "Bloom comes in time"],
+    "mood": "hopeful",
+    "theme": "patience",
+    "tags": ["growth", "trust", "timing"]
+  },
+  {
+    "id": "openness-001",
+    "lines": ["Empty your cup", "Room for new wisdom to pour", "Let go to grow more"],
+    "mood": "reflective",
+    "theme": "openness",
+    "tags": ["learning", "humility", "release"]
+  },
+  {
+    "id": "adaptability-001",
+    "lines": ["Wind against you", "Bend but never choose to break", "Flexibility wins"],
+    "mood": "steady",
+    "theme": "adaptability",
+    "tags": ["flexibility", "pressure", "resilience"]
+  },
+  {
+    "id": "calm-001",
+    "lines": ["One breath at a time", "Anxiety loses its grip", "Calm is always near"],
+    "mood": "calm",
+    "theme": "presence",
+    "tags": ["breath", "anxiety", "grounding"]
+  },
+  {
+    "id": "contrast-001",
+    "lines": ["Stars need the dark night", "Your struggles frame your shine", "Embrace the contrast"],
+    "mood": "hopeful",
+    "theme": "perspective",
+    "tags": ["struggle", "light", "acceptance"]
+  },
+  {
+    "id": "persistence-001",
+    "lines": ["River cuts through rock", "Not with force but persistence", "Gentle power flows"],
+    "mood": "patient",
+    "theme": "persistence",
+    "tags": ["water", "gentleness", "discipline"]
+  },
+  {
+    "id": "confidence-001",
+    "lines": ["Doubt is a shadow", "Walk straight into the light", "Shadows fade behind"],
+    "mood": "brave",
+    "theme": "confidence",
+    "tags": ["doubt", "light", "courage"]
+  },
+  {
+    "id": "release-001",
+    "lines": ["Cherry blossoms fall", "Beauty lives in letting go", "Release brings new spring"],
+    "mood": "peaceful",
+    "theme": "release",
+    "tags": ["letting-go", "spring", "renewal"]
+  },
+  {
+    "id": "growth-001",
+    "lines": ["Mountain peak awaits", "The climb is where you become", "Summit is a bonus"],
+    "mood": "ambitious",
+    "theme": "growth",
+    "tags": ["mountain", "journey", "progress"]
+  },
+  {
+    "id": "clarity-001",
+    "lines": ["Still water reflects", "Quiet your mind and see clear", "Answers live within"],
+    "mood": "calm",
+    "theme": "clarity",
+    "tags": ["stillness", "reflection", "wisdom"]
+  },
+  {
+    "id": "healing-001",
+    "lines": ["Broken pottery", "Gold fills the cracks with pride", "You are more whole now"],
+    "mood": "healing",
+    "theme": "self-worth",
+    "tags": ["repair", "wholeness", "acceptance"]
+  },
+  {
+    "id": "rest-001",
+    "lines": ["Winter trees stand bare", "Roots grow deeper in the cold", "Rest is not defeat"],
+    "mood": "reassuring",
+    "theme": "rest",
+    "tags": ["winter", "roots", "recovery"]
+  },
+  {
+    "id": "perspective-001",
+    "lines": ["Ocean vast and deep", "One wave does not make the sea", "Small failures mean naught"],
+    "mood": "grounded",
+    "theme": "perspective",
+    "tags": ["ocean", "failure", "patience"]
+  },
+  {
+    "id": "grounding-001",
+    "lines": ["Bamboo in the wind", "Sways but never loses root", "Know what grounds you"],
+    "mood": "steady",
+    "theme": "grounding",
+    "tags": ["bamboo", "roots", "stability"]
+  },
+  {
+    "id": "renewal-001",
+    "lines": ["First light breaks the dark", "Every dawn says start again", "Mercy is morning"],
+    "mood": "hopeful",
+    "theme": "renewal",
+    "tags": ["dawn", "restart", "mercy"]
+  },
+  {
+    "id": "focus-001",
+    "lines": ["Eagle high above", "Sees the whole picture below", "Rise above the noise"],
+    "mood": "clear",
+    "theme": "focus",
+    "tags": ["vision", "noise", "perspective"]
+  },
+  {
+    "id": "stillness-001",
+    "lines": ["Stone in the garden", "Stillness teaches what motion", "Cannot ever teach"],
+    "mood": "quiet",
+    "theme": "stillness",
+    "tags": ["garden", "patience", "reflection"]
+  },
+  {
+    "id": "emergence-001",
+    "lines": ["Lotus from the mud", "Purity finds its own way", "Rise from where you are"],
+    "mood": "uplifted",
+    "theme": "emergence",
+    "tags": ["lotus", "growth", "beginning"]
+  },
+  {
+    "id": "gratitude-001",
+    "lines": ["Tea cup half or full", "Your view shapes experience", "Choose the fuller lens"],
+    "mood": "grateful",
+    "theme": "mindset",
+    "tags": ["gratitude", "choice", "perspective"]
+  },
+  {
+    "id": "belonging-001",
+    "lines": ["Footprints in the snow", "Someone walked this path before", "You are never lost"],
+    "mood": "comforted",
+    "theme": "belonging",
+    "tags": ["path", "guidance", "connection"]
+  },
+  {
+    "id": "impact-001",
+    "lines": ["Candle in the dark", "One small flame lights a room", "Your spark matters now"],
+    "mood": "encouraged",
+    "theme": "impact",
+    "tags": ["light", "purpose", "hope"]
+  },
+  {
+    "id": "release-002",
+    "lines": ["Autumn leaves let go", "Trees do not mourn what has passed", "Grace in releasing"],
+    "mood": "peaceful",
+    "theme": "release",
+    "tags": ["autumn", "grace", "letting-go"]
+  },
+  {
+    "id": "beginnings-001",
+    "lines": ["Strong oak grew from seed", "Great things begin very small", "Honor your beginnings"],
+    "mood": "encouraged",
+    "theme": "beginnings",
+    "tags": ["seed", "growth", "humility"]
+  },
+  {
+    "id": "generosity-001",
+    "lines": ["Moon reflects the sun", "You carry light not your own", "Share what shines through you"],
+    "mood": "warm",
+    "theme": "generosity",
+    "tags": ["light", "sharing", "humility"]
+  },
+  {
+    "id": "challenge-001",
+    "lines": ["Kite needs the wind push", "Resistance lifts you higher", "Challenges serve you"],
+    "mood": "bold",
+    "theme": "challenge",
+    "tags": ["resistance", "growth", "courage"]
+  },
+  {
+    "id": "craft-001",
+    "lines": ["Garden overgrown", "Patience and work reveal blooms", "Nothing worth comes fast"],
+    "mood": "patient",
+    "theme": "craft",
+    "tags": ["garden", "work", "patience"]
+  },
+  {
+    "id": "choice-001",
+    "lines": ["Bridge over the gap", "You become what you choose", "Step forward with faith"],
+    "mood": "brave",
+    "theme": "choice",
+    "tags": ["faith", "decision", "movement"]
+  },
+  {
+    "id": "trust-001",
+    "lines": ["Rain feeds the forest", "Hard times nourish deep growth", "Trust the process now"],
+    "mood": "hopeful",
+    "theme": "trust",
+    "tags": ["rain", "growth", "hardship"]
+  },
+  {
+    "id": "receiving-001",
+    "lines": ["Open empty hand", "Holding tight keeps nothing safe", "Let go to receive"],
+    "mood": "open",
+    "theme": "receiving",
+    "tags": ["release", "trust", "openness"]
+  },
+  {
+    "id": "creativity-001",
+    "lines": ["Dawn paints the horizon", "Each day a brand new artwork", "You are the artist"],
+    "mood": "inspired",
+    "theme": "creativity",
+    "tags": ["dawn", "art", "agency"]
+  },
+  {
+    "id": "connection-001",
+    "lines": ["Roots intertwined", "No tree stands alone in strength", "Reach out and connect"],
+    "mood": "connected",
+    "theme": "community",
+    "tags": ["roots", "support", "relationship"]
+  },
+  {
+    "id": "clarity-002",
+    "lines": ["Fog lifts from the lake", "Clarity comes when you wait", "Do not force the view"],
+    "mood": "calm",
+    "theme": "clarity",
+    "tags": ["fog", "waiting", "patience"]
+  },
+  {
+    "id": "pressure-001",
+    "lines": ["Hammer strikes the steel", "Sparks fly but the blade forms", "Pressure creates you"],
+    "mood": "fierce",
+    "theme": "pressure",
+    "tags": ["steel", "formation", "strength"]
+  },
+  {
+    "id": "persistence-002",
+    "lines": ["Wildflower in crack", "Life finds a way to persist", "So will you always"],
+    "mood": "hopeful",
+    "theme": "persistence",
+    "tags": ["wildflower", "survival", "resilience"]
+  },
+  {
+    "id": "training-001",
+    "lines": ["Smooth sea never made", "A skilled and worthy sailor", "Rough waters train best"],
+    "mood": "determined",
+    "theme": "training",
+    "tags": ["sea", "skill", "challenge"]
+  },
+  {
+    "id": "cycles-001",
+    "lines": ["Sun sets then will rise", "Endings carry new beginnings", "Trust the rhythm now"],
+    "mood": "hopeful",
+    "theme": "cycles",
+    "tags": ["ending", "beginning", "rhythm"]
+  },
+  {
+    "id": "joy-001",
+    "lines": ["Sandcastle by shore", "Build it knowing tide will come", "Joy is in the making"],
+    "mood": "light",
+    "theme": "joy",
+    "tags": ["making", "impermanence", "play"]
+  },
+  {
+    "id": "self-compassion-001",
+    "lines": ["Mirror shows the truth", "Look with kindness at yourself", "You deserve that grace"],
+    "mood": "gentle",
+    "theme": "self-compassion",
+    "tags": ["kindness", "truth", "grace"]
+  },
+  {
+    "id": "courage-001",
+    "lines": ["Bird leaves the nest first", "Fear of falling is natural", "Sky proves wings were real"],
+    "mood": "brave",
+    "theme": "courage",
+    "tags": ["fear", "flight", "trust"]
+  },
+  {
+    "id": "individuality-001",
+    "lines": ["Snowflake unique form", "No two paths are quite the same", "Honor your own way"],
+    "mood": "affirming",
+    "theme": "individuality",
+    "tags": ["uniqueness", "path", "self-trust"]
+  },
+  {
+    "id": "nourishment-001",
+    "lines": ["Fire needs both wood", "And air to keep burning bright", "Nurture what feeds you"],
+    "mood": "warm",
+    "theme": "nourishment",
+    "tags": ["fire", "energy", "care"]
+  },
+  {
+    "id": "ownership-001",
+    "lines": ["Path splits in the wood", "Both ways hold their own beauty", "Choose and own it fully"],
+    "mood": "grounded",
+    "theme": "ownership",
+    "tags": ["choice", "path", "commitment"]
+  },
+  {
+    "id": "endurance-001",
+    "lines": ["Ancient standing rock", "Weathered by a thousand storms", "Still it does not move"],
+    "mood": "steadfast",
+    "theme": "endurance",
+    "tags": ["rock", "storm", "stability"]
+  },
+  {
+    "id": "harvest-001",
+    "lines": ["Harvest time arrives", "Seeds of effort now bear fruit", "Your work was not in vain"],
+    "mood": "satisfied",
+    "theme": "harvest",
+    "tags": ["effort", "reward", "patience"]
+  },
+  {
+    "id": "quiet-strength-001",
+    "lines": ["Dew on spider web", "Delicate yet holds so strong", "Quiet strength is real"],
+    "mood": "quiet",
+    "theme": "quiet strength",
+    "tags": ["delicacy", "strength", "morning"]
+  },
+  {
+    "id": "guidance-001",
+    "lines": ["Lantern in the dark", "Need not light the whole world", "Just your next few steps"],
+    "mood": "calm",
+    "theme": "guidance",
+    "tags": ["lantern", "steps", "focus"]
+  },
+  {
+    "id": "patience-002",
+    "lines": ["Crane stands still and tall", "Patience is its greatest hunt", "Wait for your moment"],
+    "mood": "patient",
+    "theme": "patience",
+    "tags": ["timing", "stillness", "readiness"]
+  },
+  {
+    "id": "potential-001",
+    "lines": ["Volcano sleeps long", "Power resting underneath", "Your calm holds great force"],
+    "mood": "powerful",
+    "theme": "potential",
+    "tags": ["calm", "power", "restraint"]
+  },
+  {
+    "id": "return-001",
+    "lines": ["Tide always returns", "What feels lost will come back", "Nature keeps her word"],
+    "mood": "reassuring",
+    "theme": "return",
+    "tags": ["tide", "trust", "nature"]
+  }
+]

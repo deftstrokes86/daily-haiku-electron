@@ -1,15 +1,30 @@
-const { app, BrowserWindow, Tray, Menu, Notification, nativeImage, ipcMain, screen } = require('electron');
+const { app, BrowserWindow, Tray, Menu, Notification, nativeImage, ipcMain, screen, powerMonitor } = require('electron');
+const fs = require('fs');
 const path = require('path');
+const { createActiveTimeScheduler } = require('./src/scheduler/activeTimeScheduler');
 
 const APP_NAME = 'Daily Haiku';
 const APP_ID = 'com.dailyhaiku.app';
 const WINDOW_WIDTH = 580;
 const WINDOW_HEIGHT = 660;
+const DEFAULT_INTERVAL_MINUTES = 60;
+const SCHEDULER_TICK_MS = 5 * 1000;
+const DEFAULT_IDLE_THRESHOLD_MS = 5 * 60 * 1000;
 
 let mainWindow = null;
 let tray = null;
-let haikuTimer = null;
-let currentInterval = 60;
+let schedulerLoop = null;
+let currentIntervalMinutes = DEFAULT_INTERVAL_MINUTES;
+let idleThresholdMs = DEFAULT_IDLE_THRESHOLD_MS;
+let scheduler = createActiveTimeScheduler({
+  intervalMs: minutesToMilliseconds(DEFAULT_INTERVAL_MINUTES)
+});
+let trackedEnvironmentState = {
+  isSuspended: false,
+  isLocked: false,
+  isInQuietHours: false
+};
+let haikuDataCache = null;
 
 app.setName(APP_NAME);
 if (process.platform === 'win32') {
@@ -60,10 +75,175 @@ function getAppIcon() {
   return diskIcon.isEmpty() ? createDefaultIcon() : diskIcon;
 }
 
+function loadHaikuData() {
+  if (!haikuDataCache) {
+    const dataPath = path.join(__dirname, 'src', 'data', 'haikus.json');
+    haikuDataCache = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+  }
+
+  return haikuDataCache;
+}
+
 function sendToRenderer(channel) {
   if (mainWindow && !mainWindow.isDestroyed()) {
     mainWindow.webContents.send(channel);
   }
+}
+
+function sendToRendererWithPayload(channel, payload) {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send(channel, payload);
+  }
+}
+
+function minutesToMilliseconds(minutes) {
+  return Number(minutes) * 60 * 1000;
+}
+
+function normalizePositiveMilliseconds(value, label) {
+  const milliseconds = Number(value);
+
+  if (!Number.isFinite(milliseconds) || milliseconds <= 0) {
+    throw new RangeError(`${label} must be a positive number of milliseconds`);
+  }
+
+  return milliseconds;
+}
+
+function getSystemIdleState() {
+  const idleThresholdSeconds = Math.max(1, Math.ceil(idleThresholdMs / 1000));
+
+  try {
+    return powerMonitor.getSystemIdleState(idleThresholdSeconds);
+  } catch (_error) {
+    return 'unknown';
+  }
+}
+
+function getSystemIdleTimeMs() {
+  try {
+    return powerMonitor.getSystemIdleTime() * 1000;
+  } catch (_error) {
+    return 0;
+  }
+}
+
+// Timing lives in the main process because only Electron's main side can
+// reliably observe screen lock, system idle, and suspend/resume state. The
+// renderer can draw a countdown, but it should not decide when haikus fire.
+function getEnvironmentState() {
+  const idleState = getSystemIdleState();
+  const idleTimeMs = getSystemIdleTimeMs();
+  const isLocked = trackedEnvironmentState.isLocked || idleState === 'locked';
+
+  return {
+    isLocked,
+    isIdle: !isLocked && (idleState === 'idle' || idleTimeMs >= idleThresholdMs),
+    isSuspended: trackedEnvironmentState.isSuspended,
+    isInQuietHours: trackedEnvironmentState.isInQuietHours
+  };
+}
+
+function getSchedulerSnapshot(now = Date.now()) {
+  return {
+    ...scheduler.getSnapshot(now),
+    currentIntervalMinutes,
+    idleThresholdMs,
+    tickMs: SCHEDULER_TICK_MS
+  };
+}
+
+function broadcastSchedulerSnapshot(now = Date.now()) {
+  sendToRendererWithPayload('scheduler:snapshot', getSchedulerSnapshot(now));
+}
+
+function runSchedulerTick(now = Date.now()) {
+  const event = scheduler.tick(now, getEnvironmentState());
+
+  if (event && event.type === 'TRIGGER_HAIKU') {
+    sendToRenderer('trigger-popup');
+  }
+
+  broadcastSchedulerSnapshot(now);
+  return event;
+}
+
+function resetScheduler(now = Date.now()) {
+  const snapshot = scheduler.reset(now);
+  broadcastSchedulerSnapshot(now);
+  return {
+    ...snapshot,
+    currentIntervalMinutes,
+    idleThresholdMs,
+    tickMs: SCHEDULER_TICK_MS
+  };
+}
+
+function updateSchedulerIntervalMs(intervalMs, now = Date.now()) {
+  const nextIntervalMs = normalizePositiveMilliseconds(intervalMs, 'intervalMs');
+  currentIntervalMinutes = nextIntervalMs / 60 / 1000;
+  const snapshot = scheduler.updateInterval(nextIntervalMs, now);
+  broadcastSchedulerSnapshot(now);
+  return {
+    ...snapshot,
+    currentIntervalMinutes,
+    idleThresholdMs,
+    tickMs: SCHEDULER_TICK_MS
+  };
+}
+
+function updateSchedulerIntervalMinutes(minutes, now = Date.now()) {
+  const nextMinutes = Number(minutes);
+
+  if (!Number.isFinite(nextMinutes) || nextMinutes <= 0) {
+    return getSchedulerSnapshot(now);
+  }
+
+  return updateSchedulerIntervalMs(minutesToMilliseconds(nextMinutes), now);
+}
+
+function setIdleThresholdMs(thresholdMs, now = Date.now()) {
+  idleThresholdMs = normalizePositiveMilliseconds(thresholdMs, 'idleThresholdMs');
+  broadcastSchedulerSnapshot(now);
+  return getSchedulerSnapshot(now);
+}
+
+function triggerHaikuNow(now = Date.now()) {
+  resetScheduler(now);
+  sendToRenderer('trigger-popup');
+  broadcastSchedulerSnapshot(now);
+}
+
+function startSchedulerLoop(now = Date.now()) {
+  if (schedulerLoop) clearInterval(schedulerLoop);
+
+  scheduler.start(now);
+  broadcastSchedulerSnapshot(now);
+  schedulerLoop = setInterval(() => {
+    runSchedulerTick(Date.now());
+  }, SCHEDULER_TICK_MS);
+}
+
+function stopSchedulerLoop() {
+  if (schedulerLoop) {
+    clearInterval(schedulerLoop);
+    schedulerLoop = null;
+  }
+}
+
+function markSchedulerInactive(now, key, reason) {
+  runSchedulerTick(now);
+  trackedEnvironmentState[key] = true;
+  scheduler.pause(now, reason);
+  scheduler.tick(now, getEnvironmentState());
+  broadcastSchedulerSnapshot(now);
+}
+
+function markSchedulerActive(now, key, reason) {
+  trackedEnvironmentState[key] = false;
+  scheduler.resume(now, reason);
+  scheduler.tick(now, getEnvironmentState());
+  broadcastSchedulerSnapshot(now);
 }
 
 function showMainWindow() {
@@ -87,7 +267,7 @@ function createTray() {
 
   const menu = Menu.buildFromTemplate([
     { label: 'Show Haiku', click: showMainWindow },
-    { label: 'Next Haiku Now', click: () => sendToRenderer('trigger-popup') },
+    { label: 'Next Haiku Now', click: () => triggerHaikuNow() },
     { type: 'separator' },
     {
       label: 'Settings',
@@ -154,18 +334,6 @@ function createWindow() {
   });
 }
 
-function startTimer(minutes = currentInterval) {
-  const nextInterval = Number(minutes);
-  if (!Number.isFinite(nextInterval) || nextInterval <= 0) return;
-
-  currentInterval = nextInterval;
-  if (haikuTimer) clearInterval(haikuTimer);
-
-  haikuTimer = setInterval(() => {
-    sendToRenderer('trigger-popup');
-  }, currentInterval * 60 * 1000);
-}
-
 ipcMain.on('minimize-window', () => {
   if (mainWindow && !mainWindow.isDestroyed()) mainWindow.minimize();
 });
@@ -187,8 +355,29 @@ ipcMain.on('show-native-notification', (_event, text) => {
   notification.show();
 });
 
-ipcMain.on('update-interval', (_event, minutes) => startTimer(minutes));
-ipcMain.on('reset-timer', () => startTimer());
+ipcMain.on('update-interval', (_event, minutes) => {
+  updateSchedulerIntervalMinutes(minutes);
+});
+
+ipcMain.on('reset-timer', () => {
+  resetScheduler();
+});
+
+ipcMain.handle('scheduler:get-snapshot', () => {
+  return getSchedulerSnapshot();
+});
+
+ipcMain.handle('scheduler:update-interval', (_event, intervalMs) => {
+  return updateSchedulerIntervalMs(intervalMs);
+});
+
+ipcMain.handle('scheduler:reset', () => {
+  return resetScheduler();
+});
+
+ipcMain.handle('scheduler:set-idle-threshold', (_event, thresholdMs) => {
+  return setIdleThresholdMs(thresholdMs);
+});
 
 ipcMain.on('toggle-autolaunch', (_event, enabled) => {
   const openAtLogin = Boolean(enabled);
@@ -203,10 +392,30 @@ ipcMain.handle('get-autolaunch', () => {
   return app.getLoginItemSettings().openAtLogin;
 });
 
+ipcMain.handle('haikus:get-all', () => {
+  return loadHaikuData();
+});
+
 app.whenReady().then(() => {
   createWindow();
   createTray();
-  startTimer(60);
+  startSchedulerLoop();
+
+  powerMonitor.on('suspend', () => {
+    markSchedulerInactive(Date.now(), 'isSuspended', 'system-suspend');
+  });
+
+  powerMonitor.on('resume', () => {
+    markSchedulerActive(Date.now(), 'isSuspended', 'system-resume');
+  });
+
+  powerMonitor.on('lock-screen', () => {
+    markSchedulerInactive(Date.now(), 'isLocked', 'screen-locked');
+  });
+
+  powerMonitor.on('unlock-screen', () => {
+    markSchedulerActive(Date.now(), 'isLocked', 'screen-unlocked');
+  });
 });
 
 app.on('activate', () => {
@@ -215,5 +424,5 @@ app.on('activate', () => {
 
 app.on('before-quit', () => {
   app.isQuitting = true;
-  if (haikuTimer) clearInterval(haikuTimer);
+  stopSchedulerLoop();
 });

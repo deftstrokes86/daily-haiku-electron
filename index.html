@@ -300,10 +300,12 @@
   <div class="tp active" id="panel-haiku">
     <div class="ps">
       <div class="hh">
-        <div class="hh-label">Today's Haiku</div>
+        <div class="hh-label">Hourly Haiku</div>
         <div class="ht" id="haikuText"></div>
         <div class="hm">
           <span id="haikuDate"></span>
+          <span class="dt"></span>
+          <span id="haikuMeta"></span>
           <span class="dt"></span>
           <span id="haikuIndex"></span>
         </div>
@@ -320,7 +322,7 @@
       </div>
     </div>
     <div class="cb">
-      <div class="cl"><span class="pu"></span> Next haiku in</div>
+      <div class="cl"><span class="pu"></span><span id="countdownStatus">Next haiku in</span></div>
       <div class="cp"><div class="cf" id="countdownFill"></div></div>
       <div class="ct" id="countdownTime"></div>
     </div>
@@ -396,77 +398,25 @@
 <!-- Toast -->
 <div class="toast" id="toast"><i class="fa-solid fa-check"></i><span id="toastTxt"></span></div>
 
+<script src="./src/renderer/haikuEngine.js"></script>
 <script>
-// ===================== HAIKU DATABASE =====================
-const haikus=[
-  {text:["Rise before the sun","The quiet world is your canvas","Paint your own path now"]},
-  {text:["Fall seven times","Stand up eight with strong heart","Strength lives in trying"]},
-  {text:["Small steps each day","Mountains move beneath your feet","Keep walking forward"]},
-  {text:["Storm clouds may gather","Your inner light burns steady","Rain cannot dim you"]},
-  {text:["Seed in dark soil","Trust the unseen growth within","Bloom comes in time"]},
-  {text:["Empty your cup","Room for new wisdom to pour","Let go to grow more"]},
-  {text:["Wind against you","Bend but never choose to break","Flexibility wins"]},
-  {text:["One breath at a time","Anxiety loses its grip","Calm is always near"]},
-  {text:["Stars need the dark night","Your struggles frame your shine","Embrace the contrast"]},
-  {text:["River cuts through rock","Not with force but persistence","Gentle power flows"]},
-  {text:["Doubt is a shadow","Walk straight into the light","Shadows fade behind"]},
-  {text:["Cherry blossoms fall","Beauty lives in letting go","Release brings new spring"]},
-  {text:["Mountain peak awaits","The climb is where you become","Summit is a bonus"]},
-  {text:["Still water reflects","Quiet your mind and see clear","Answers live within"]},
-  {text:["Broken pottery","Gold fills the cracks with pride","You are more whole now"]},
-  {text:["Winter trees stand bare","Roots grow deeper in the cold","Rest is not defeat"]},
-  {text:["Ocean vast and deep","One wave does not make the sea","Small failures mean naught"]},
-  {text:["Bamboo in the wind","Sways but never loses root","Know what grounds you"]},
-  {text:["First light breaks the dark","Every dawn says start again","Mercy is morning"]},
-  {text:["Eagle high above","Sees the whole picture below","Rise above the noise"]},
-  {text:["Stone in the garden","Stillness teaches what motion","Cannot ever teach"]},
-  {text:["Lotus from the mud","Purity finds its own way","Rise from where you are"]},
-  {text:["Tea cup half or full","Your view shapes experience","Choose the fuller lens"]},
-  {text:["Footprints in the snow","Someone walked this path before","You are never lost"]},
-  {text:["Candle in the dark","One small flame lights a room","Your spark matters now"]},
-  {text:["Autumn leaves let go","Trees do not mourn what has passed","Grace in releasing"]},
-  {text:["Strong oak grew from seed","Great things begin very small","Honor your beginnings"]},
-  {text:["Moon reflects the sun","You carry light not your own","Share what shines through you"]},
-  {text:["Kite needs the wind push","Resistance lifts you higher","Challenges serve you"]},
-  {text:["Garden overgrown","Patience and work reveal blooms","Nothing worth comes fast"]},
-  {text:["Bridge over the gap","You become what you choose","Step forward with faith"]},
-  {text:["Rain feeds the forest","Hard times nourish deep growth","Trust the process now"]},
-  {text:["Open empty hand","Holding tight keeps nothing safe","Let go to receive"]},
-  {text:["Dawn paints the horizon","Each day a brand new artwork","You are the artist"]},
-  {text:["Roots intertwined","No tree stands alone in strength","Reach out and connect"]},
-  {text:["Fog lifts from the lake","Clarity comes when you wait","Do not force the view"]},
-  {text:["Hammer strikes the steel","Sparks fly but the blade forms","Pressure creates you"]},
-  {text:["Wildflower in crack","Life finds a way to persist","So will you always"]},
-  {text:["Smooth sea never made","A skilled and worthy sailor","Rough waters train best"]},
-  {text:["Sun sets then will rise","Endings carry new beginnings","Trust the rhythm now"]},
-  {text:["Sandcastle by shore","Build it knowing tide will come","Joy is in the making"]},
-  {text:["Mirror shows the truth","Look with kindness at yourself","You deserve that grace"]},
-  {text:["Bird leaves the nest first","Fear of falling is natural","Sky proves wings were real"]},
-  {text:["Snowflake unique form","No two paths are quite the same","Honor your own way"]},
-  {text:["Fire needs both wood","And air to keep burning bright","Nurture what feeds you"]},
-  {text:["Path splits in the wood","Both ways hold their own beauty","Choose and own it fully"]},
-  {text:["Ancient standing rock","Weathered by a thousand storms","Still it does not move"]},
-  {text:["Harvest time arrives","Seeds of effort now bear fruit","Your work was not in vain"]},
-  {text:["Dew on spider web","Delicate yet holds so strong","Quiet strength is real"]},
-  {text:["Lantern in the dark","Need not light the whole world","Just your next few steps"]},
-  {text:["Crane stands still and tall","Patience is its greatest hunt","Wait for your moment"]},
-  {text:["Volcano sleeps long","Power resting underneath","Your calm holds great force"]},
-  {text:["Tide always returns","What feels lost will come back","Nature keeps her word"]}
-];
+const HE=window.DailyHaikuEngine;
+let haikus=[];
 
 // ===================== STATE =====================
-let S={cur:null,idx:-1,history:[],favs:[],interval:60,popup:true,sound:true,lastT:Date.now()};
+let S={cur:null,idx:-1,history:[],favs:[],interval:60,popup:true,sound:true,shownHaikuIds:[]};
 
 function load(){
   try{const d=JSON.parse(localStorage.getItem('dhState')||'{}');
     S.history=d.history||[];S.favs=d.favs||[];S.interval=d.interval||60;
-    S.popup=d.popup!==false;S.sound=d.sound!==false;S.lastT=d.lastT||Date.now();
+    S.shownHaikuIds=Array.isArray(d.shownHaikuIds)?d.shownHaikuIds:[];
+    S.popup=d.popup!==false;S.sound=d.sound!==false;
   }catch(e){}
 }
 function save(){
   try{localStorage.setItem('dhState',JSON.stringify({
     history:S.history.slice(0,20),favs:S.favs,interval:S.interval,
-    popup:S.popup,sound:S.sound,lastT:S.lastT
+    popup:S.popup,sound:S.sound,shownHaikuIds:S.shownHaikuIds
   }))}catch(e){}
 }
 
@@ -477,88 +427,137 @@ function switchTab(t){
 }
 
 // ===================== HAIKU LOGIC =====================
-function dayHaiku(){
-  const d=new Date,s=d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();
-  const i=s%haikus.length;return{h:haikus[i],i};
+async function loadHaikuData(){
+  try{
+    const raw=await window.electronAPI.getHaikus();
+    haikus=HE.normalizeHaikus(raw);
+  }catch(e){
+    haikus=[];
+    toast('Could not load haikus');
+  }
 }
-function randHaiku(ex){
-  let i;do{i=Math.floor(Math.random()*haikus.length)}while(i===ex&&haikus.length>1);
-  return{h:haikus[i],i};
+function selectHaiku(){
+  const r=HE.selectNextHaiku(haikus,{shownIds:S.shownHaikuIds},{currentId:S.cur&&S.cur.id});
+  S.shownHaikuIds=r.queueState.shownIds;
+  return{h:r.haiku,i:r.index};
+}
+function haikuRecord(h,i){
+  return{id:h.id,t:HE.getHaikuText(h),i,time:new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}),mood:h.mood,theme:h.theme};
 }
 function display(h,i,anim){
+  if(!h)return;
   S.cur=h;S.idx=i;
   const c=document.getElementById('haikuText');
-  c.innerHTML=h.text.map(l=>`<span class="ln${anim?'':' na'}">${l}</span>`).join('');
+  c.innerHTML=HE.getHaikuLines(h).map(l=>`<span class="ln${anim?'':' na'}">${l}</span>`).join('');
   document.getElementById('haikuDate').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+  document.getElementById('haikuMeta').textContent=HE.getHaikuMeta(h);
   document.getElementById('haikuIndex').textContent=`Haiku ${i+1} of ${haikus.length}`;
   updFavBtn();
 }
 function newHaiku(){
-  const{h,i}=randHaiku(S.idx);display(h,i,true);
-  S.history.unshift({t:h.text.join('\n'),i,time:new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})});
-  S.history=S.history.slice(0,8);updHist();save();resetCD();resetMainTimer();
+  const{h,i}=selectHaiku();display(h,i,true);
+  if(!h)return;
+  S.history.unshift(haikuRecord(h,i));
+  S.history=S.history.slice(0,8);updHist();save();resetMainTimer();
 }
 function initHaiku(){
-  const{h,i}=dayHaiku();display(h,i,true);
-  if(!S.history.length||S.history[0].i!==i){
-    S.history.unshift({t:h.text.join('\n'),i,time:new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})});
+  const{h,i}=selectHaiku();display(h,i,true);
+  if(h&&(!S.history.length||S.history[0].id!==h.id)){
+    S.history.unshift(haikuRecord(h,i));
     S.history=S.history.slice(0,8);
   }
-  updHist();updFavs();
+  updHist();updFavs();save();
 }
 
 // ===================== FAVORITES =====================
 function toggleFavorite(){
   if(!S.cur)return;
-  const x=S.favs.findIndex(f=>f.i===S.idx);
+  const x=S.favs.findIndex(f=>favId(f)===S.cur.id);
   if(x>-1){S.favs.splice(x,1);toast('Removed from favorites')}
-  else{S.favs.unshift({t:S.cur.text.join('\n'),i:S.idx,
+  else{S.favs.unshift({id:S.cur.id,t:HE.getHaikuText(S.cur),i:S.idx,mood:S.cur.mood,theme:S.cur.theme,
     time:new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}),
     date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'})});
     toast('Saved to favorites')}
   updFavBtn();updFavs();save();
 }
 function updFavBtn(){
-  const b=document.getElementById('favBtn'),f=S.favs.some(x=>x.i===S.idx);
+  const b=document.getElementById('favBtn'),f=S.favs.some(x=>favId(x)===S.cur?.id);
   b.classList.toggle('fav',f);
   b.innerHTML=f?'<i class="fa-solid fa-heart"></i><span>Saved</span>':'<i class="fa-regular fa-heart"></i><span>Save</span>';
 }
+function favId(f){return f.id||legacyHaiku(f.i)?.id||null}
+function legacyHaiku(i){return HE.findHaikuByLegacyRef(haikus,i)}
+function entryText(x){return x.t||(legacyHaiku(x.i)?HE.getHaikuText(legacyHaiku(x.i)):'')}
 function updFavs(){
   const c=document.getElementById('favContent');
   if(!S.favs.length){c.innerHTML='<div class="fe"><i class="fa-regular fa-bookmark"></i><p>No saved haikus yet.<br>Click the heart on any haiku to save it here.</p></div>';return}
-  c.innerHTML='<div class="fl">'+S.favs.map((f,j)=>`<div class="fi"><div class="ft">${f.t.replace(/\n/g,'<br>')}</div><div class="fb"><span class="fv">${f.date||''} ${f.time}</span><button class="fr" onclick="rmFav(${j})" aria-label="Remove"><i class="fa-solid fa-xmark"></i></button></div></div>`).join('')+'</div>';
+  c.innerHTML='<div class="fl">'+S.favs.map((f,j)=>`<div class="fi"><div class="ft">${entryText(f).replace(/\n/g,'<br>')}</div><div class="fb"><span class="fv">${f.date||''} ${f.time||''}</span><button class="fr" onclick="rmFav(${j})" aria-label="Remove"><i class="fa-solid fa-xmark"></i></button></div></div>`).join('')+'</div>';
 }
 function rmFav(j){S.favs.splice(j,1);updFavBtn();updFavs();save();toast('Removed')}
 
 // ===================== HISTORY =====================
 function updHist(){
-  document.getElementById('historyList').innerHTML=S.history.slice(0,5).map(x=>`<div class="hi" onclick="loadHist(${x.i})">${x.t.replace(/\n/g,'<br>')}<div class="tm">${x.time}</div></div>`).join('');
+  document.getElementById('historyList').innerHTML=S.history.slice(0,5).map((x,j)=>`<div class="hi" onclick="loadHist(${j})">${entryText(x).replace(/\n/g,'<br>')}<div class="tm">${x.time||''}</div></div>`).join('');
 }
-function loadHist(i){if(haikus[i])display(haikus[i],i,true)}
+function loadHist(j){const x=S.history[j],h=HE.findHaikuByLegacyRef(haikus,x&&x.id?x.id:x&&x.i),i=haikus.findIndex(v=>v.id===h?.id);if(h)display(h,i,true)}
 
 // ===================== COPY =====================
 function copyHaiku(){
-  if(!S.cur)return;const t=S.cur.text.join('\n');
+  if(!S.cur)return;const t=HE.getHaikuText(S.cur);
   navigator.clipboard.writeText(t).then(()=>toast('Copied to clipboard')).catch(()=>{
     const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();document.execCommand('copy');document.body.removeChild(a);toast('Copied to clipboard');
   });
 }
 
 // ===================== COUNTDOWN =====================
-let cdStart=Date.now();
-function resetCD(){cdStart=Date.now();S.lastT=Date.now();save()}
-function resetMainTimer(){if(window.electronAPI)window.electronAPI.resetTimer()}
-function updCD(){
-  const el=Date.now()-cdStart,tot=S.interval*6e4,rem=Math.max(0,tot-el);
-  document.getElementById('countdownFill').style.width=Math.min(100,el/tot*100)+'%';
-  const m=Math.floor(rem/6e4),s=Math.floor((rem%6e4)/1e3);
-  document.getElementById('countdownTime').textContent=`${m}m ${String(s).padStart(2,'0')}s remaining`;
+let lastCountdownStatus='';
+let lastCountdownText='';
+let lastCountdownWidth='';
+function resetMainTimer(){
+  if(!window.electronAPI)return;
+  if(window.electronAPI.resetScheduler)window.electronAPI.resetScheduler();
+  else window.electronAPI.resetTimer();
+}
+function formatRemaining(ms){
+  const totalSeconds=Math.max(0,Math.ceil(Number(ms||0)/1000));
+  const h=Math.floor(totalSeconds/3600);
+  const m=Math.floor((totalSeconds%3600)/60);
+  const s=totalSeconds%60;
+  if(h>0)return`${h}h ${m}m remaining`;
+  return`${m}m ${String(s).padStart(2,'0')}s remaining`;
+}
+function schedulerStatusText(snapshot){
+  if(snapshot.isSuspended)return'Paused while system is suspended';
+  if(snapshot.isLocked)return'Paused while screen is locked';
+  if(snapshot.isIdle)return'Paused while laptop is idle';
+  if(snapshot.isInQuietHours)return'Paused during quiet hours';
+  if(snapshot.paused)return'Paused';
+  return'Next haiku in';
+}
+function setTextIfChanged(el,text,lastKey){
+  if(lastKey==='status'&&lastCountdownStatus===text)return;
+  if(lastKey==='time'&&lastCountdownText===text)return;
+  el.textContent=text;
+  if(lastKey==='status')lastCountdownStatus=text;
+  if(lastKey==='time')lastCountdownText=text;
+}
+function renderSchedulerSnapshot(snapshot){
+  if(!snapshot)return;
+  const fill=document.getElementById('countdownFill');
+  const time=document.getElementById('countdownTime');
+  const status=document.getElementById('countdownStatus');
+  const progress=Math.min(1,Math.max(0,Number(snapshot.progress||0)));
+  const width=(progress*100).toFixed(1)+'%';
+  if(width!==lastCountdownWidth){fill.style.width=width;lastCountdownWidth=width}
+  setTextIfChanged(status,schedulerStatusText(snapshot),'status');
+  setTextIfChanged(time,formatRemaining(snapshot.remainingMs),'time');
 }
 function triggerPopup(){
-  const{h,i}=randHaiku(S.idx);display(h,i,true);
-  S.history.unshift({t:h.text.join('\n'),i,time:new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})});
+  const{h,i}=selectHaiku();display(h,i,true);
+  if(!h)return;
+  S.history.unshift(haikuRecord(h,i));
   S.history=S.history.slice(0,8);updHist();save();
-  if(S.popup&&window.electronAPI)window.electronAPI.showNativeNotification(h.text.join(' / '));
+  if(S.popup&&window.electronAPI)window.electronAPI.showNativeNotification(HE.getHaikuLines(h).join(' / '));
   if(S.sound)playChime();
 }
 
@@ -576,7 +575,7 @@ function playChime(){
 
 // ===================== SETTINGS =====================
 function updateInterval(){
-  S.interval=+document.getElementById('intervalSel').value;resetCD();save();
+  S.interval=+document.getElementById('intervalSel').value;save();
   if(window.electronAPI)window.electronAPI.updateInterval(S.interval);
   toast(`Interval: every ${S.interval} minute${S.interval>1?'s':''}`);
 }
@@ -596,7 +595,7 @@ function setAccent(el,c){
   document.querySelectorAll('.as').forEach(s=>s.classList.remove('sel'));
   el.classList.add('sel');localStorage.setItem('dhAccent',c);
 }
-function clearAllData(){S.favs=[];S.history=[];updFavs();updHist();updFavBtn();save();toast('All data cleared')}
+function clearAllData(){S.favs=[];S.history=[];S.shownHaikuIds=[];updFavs();updHist();updFavBtn();save();toast('All data cleared')}
 
 // ===================== TOAST =====================
 let tto=null;
@@ -620,9 +619,13 @@ function wireElectron(){
   if(!window.electronAPI)return;
   document.getElementById('minBtn').addEventListener('click',()=>window.electronAPI.minimize());
   document.getElementById('closeBtn').addEventListener('click',()=>window.electronAPI.close());
-  window.electronAPI.updateInterval(S.interval);
-  window.electronAPI.onTriggerPopup(()=>{triggerPopup();resetCD()});
+  window.electronAPI.onTriggerPopup(()=>{triggerPopup()});
   window.electronAPI.onOpenSettings(()=>switchTab('settings'));
+  if(window.electronAPI.onSchedulerSnapshot)window.electronAPI.onSchedulerSnapshot(renderSchedulerSnapshot);
+  window.electronAPI.updateInterval(S.interval);
+  if(window.electronAPI.getSchedulerSnapshot){
+    window.electronAPI.getSchedulerSnapshot().then(renderSchedulerSnapshot).catch(()=>{});
+  }
   // Restore startup toggle state
   window.electronAPI.getAutolaunch().then(on=>{
     document.getElementById('startupTgl').classList.toggle('on',on);
@@ -641,9 +644,10 @@ document.addEventListener('keydown',e=>{
 });
 
 // ===================== INIT =====================
-function init(){
+async function init(){
   if(!window.electronAPI)return;
   load();
+  await loadHaikuData();
   document.getElementById('intervalSel').value=String(S.interval);
   document.getElementById('popupTgl').classList.toggle('on',S.popup);
   document.getElementById('soundTgl').classList.toggle('on',S.sound);
@@ -655,10 +659,7 @@ function init(){
       s.classList.toggle('sel',bg===sa);
     });
   }
-  const el=Date.now()-S.lastT;
-  cdStart=el<S.interval*6e4?S.lastT:Date.now();
-  initHaiku();mkParticles();updCD();wireElectron();
-  setInterval(updCD,1000);
+  initHaiku();mkParticles();wireElectron();
 }
 function rgb2hex(c){if(!c||c[0]==='#')return(c||'').toLowerCase();
   const m=c.match(/\d+/g);if(!m)return c;return'#'+m.slice(0,3).map(x=>(+x).toString(16).padStart(2,'0')).join('');}

@@ -36,6 +36,9 @@
       "main.js",
       "preload.js",
       "index.html",
+      "src/data/**/*.json",
+      "src/renderer/**/*.js",
+      "src/scheduler/**/*.js",
       "package.json"
     ]
   },
