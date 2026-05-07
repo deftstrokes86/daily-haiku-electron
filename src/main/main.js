@@ -17,7 +17,7 @@ const { createNotificationController } = require('./notifications');
 const { createTrayController } = require('./tray');
 
 const APP_NAME = 'Daily Haiku';
-const APP_ID = 'com.dailyhaiku.app';
+const APP_ID = 'com.stillhour.app';
 const WINDOW_WIDTH = 580;
 const WINDOW_HEIGHT = 660;
 const MAX_SHARE_IMAGE_BYTES = 18 * 1024 * 1024;
@@ -89,7 +89,7 @@ function createDefaultIcon() {
 
 function getAppIcon() {
   const candidates = [
-    path.join(__dirname, '..', '..', 'build', 'icon.ico'),
+    path.join(__dirname, '..', '..', 'assets', 'icon.ico'),
     path.join(__dirname, '..', '..', 'icon.ico')
   ];
   const diskIcon = candidates

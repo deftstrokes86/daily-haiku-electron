@@ -5,25 +5,27 @@
   "author": "Daily Haiku",
   "main": "src/main/main.js",
   "scripts": {
-    "start": "set ELECTRON_RUN_AS_NODE=& electron .",
+    "start": "electron .",
     "test": "vitest run",
     "test:watch": "vitest",
     "pack": "electron-builder --dir",
-    "build": "electron-builder --win nsis",
+    "build": "electron-builder",
+    "dist": "electron-builder --win",
     "build:portable": "electron-builder --win portable",
     "build-portable": "npm run build:portable"
   },
   "build": {
-    "appId": "com.dailyhaiku.app",
-    "productName": "Daily Haiku",
+    "appId": "com.stillhour.app",
+    "productName": "StillHour",
     "asar": true,
     "directories": {
       "output": "dist"
     },
     "win": {
-      "icon": "build/icon.ico",
+      "icon": "assets/icon.ico",
       "target": [
-        "nsis"
+        "nsis",
+        "portable"
       ],
       "signAndEditExecutable": false
     },
@@ -34,14 +36,11 @@
       "createStartMenuShortcut": true
     },
     "files": [
-      "src/main/**/*.js",
-      "src/preload/**/*.js",
-      "src/renderer/**/*",
-      "src/data/**/*.json",
-      "src/popup/**/*",
-      "src/scheduler/**/*.js",
-      "build/icon.ico",
-      "build/icon.png",
+      "main.js",
+      "preload.js",
+      "index.html",
+      "src/**/*",
+      "assets/**/*",
       "package.json"
     ]
   },
