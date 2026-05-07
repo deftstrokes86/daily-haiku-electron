@@ -5,7 +5,11 @@ out/
 
 *.exe
 *.msi
+*.msix
+*.appx
+*.appinstaller
 *.dmg
+*.pkg
 *.zip
 *.7z
 *.blockmap

@@ -132,11 +132,11 @@
       <div class="sc">
         <div class="ib">
           <i class="fa-solid fa-circle-info"></i>
-          <span>This app runs in your system tray. Closing the window keeps it running in the background. Right-click the tray icon for quick actions.</span>
+          <span>This app runs in your system tray. Closing the window keeps it running in the background. Right-click the tray icon for quick actions.<br>Shortcuts: N for a new haiku, F to save, 1-4 to switch tabs, and Esc to close the share card.</span>
         </div>
         <div class="sg">
-          <div class="sl"><i class="fa-solid fa-clock"></i> Popup Interval</div>
-          <div class="sd">How often a new haiku notification appears</div>
+          <div class="sl"><i class="fa-solid fa-clock"></i> Haiku Rhythm</div>
+          <div class="sd">How much active laptop time passes before the next haiku appears</div>
           <div class="sk">
             <select class="cs" id="intervalSel">
               <option value="15">Every 15 minutes</option>
@@ -187,7 +187,7 @@
               <option value="floating">Floating haiku card</option>
               <option value="both">Both</option>
             </select>
-            <div class="tr"><span style="font-size:13px;color:var(--fg-m)">Notification alerts</span><button class="tg on" id="popupTgl" data-action="toggle-popup" aria-label="Toggle"></button></div>
+            <div class="tr"><span style="font-size:13px;color:var(--fg-m)">Show notifications</span><button class="tg on" id="popupTgl" data-action="toggle-popup" aria-label="Toggle notifications"></button></div>
           </div>
         </div>
         <div class="sg">
@@ -215,7 +215,7 @@
         </div>
         <div class="sg">
           <div class="sl"><i class="fa-solid fa-database"></i> Data</div>
-          <div class="sd">Clear all saved favorites and history</div>
+          <div class="sd">Clear saved favorites, archive entries, and reflections</div>
           <div class="sk">
             <button class="ab" data-action="clear-all-data" style="color:var(--red);border-color:rgba(196,92,74,.3)"><i class="fa-solid fa-trash-can"></i> Clear All Data</button>
           </div>

@@ -88,9 +88,15 @@ function createDefaultIcon() {
 }
 
 function getAppIcon() {
-  const icoPath = path.join(__dirname, '..', '..', 'icon.ico');
-  const diskIcon = nativeImage.createFromPath(icoPath);
-  return diskIcon.isEmpty() ? createDefaultIcon() : diskIcon;
+  const candidates = [
+    path.join(__dirname, '..', '..', 'build', 'icon.ico'),
+    path.join(__dirname, '..', '..', 'icon.ico')
+  ];
+  const diskIcon = candidates
+    .map((candidate) => nativeImage.createFromPath(candidate))
+    .find((icon) => !icon.isEmpty());
+
+  return diskIcon || createDefaultIcon();
 }
 
 function loadHaikuData() {
@@ -186,9 +192,11 @@ function normalizeIdleThresholdMs(value) {
 function persistStorePatch(patch) {
   try {
     getAppStore().update(patch);
-  } catch (error) {
-    console.warn('Could not persist Daily Haiku store update:', error.message);
+  } catch (_error) {
+    return false;
   }
+
+  return true;
 }
 
 function hydrateMainStateFromStore() {

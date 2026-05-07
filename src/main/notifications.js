@@ -27,7 +27,7 @@ function normalizeHaikuNotificationPayload(payload = {}) {
     haiku,
     lines,
     text: toText(payload.text) || lines.join('\n'),
-    meta: toText(payload.meta) || [haiku.mood, haiku.theme].filter(Boolean).join(' Â· '),
+    meta: toText(payload.meta) || [haiku.mood, haiku.theme].filter(Boolean).join(' \u00b7 '),
     notificationStyle: normalizeNotificationStyle(payload.notificationStyle)
   };
 }

@@ -482,7 +482,7 @@ function drawShareCard(canvas,haiku,options){
     ctx.fillStyle=theme.muted;
     ctx.font='28px system-ui, -apple-system, "Segoe UI", sans-serif';
     ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillText(HE.getHaikuMeta(haiku).replace(/Â·/g,'-'),w/2,format==='portrait'?h*.68:h*.70);
+    ctx.fillText(HE.getHaikuMeta(haiku).replace(/\u00b7/g,'-'),w/2,format==='portrait'?h*.68:h*.70);
   }
   if(options.showBrand){
     ctx.fillStyle=rgba(theme.ink,.64);

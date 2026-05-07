@@ -1,7 +1,7 @@
 {
   "name": "daily-haiku",
   "version": "1.0.0",
-  "description": "Motivational haiku desktop popup app for Windows",
+  "description": "A calm desktop haiku ritual for mindful active-hour pauses.",
   "author": "Daily Haiku",
   "main": "src/main/main.js",
   "scripts": {
@@ -21,6 +21,7 @@
       "output": "dist"
     },
     "win": {
+      "icon": "build/icon.ico",
       "target": [
         "nsis"
       ],
@@ -39,6 +40,8 @@
       "src/data/**/*.json",
       "src/popup/**/*",
       "src/scheduler/**/*.js",
+      "build/icon.ico",
+      "build/icon.png",
       "package.json"
     ]
   },
