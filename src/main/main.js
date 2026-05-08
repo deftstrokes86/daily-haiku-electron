@@ -25,6 +25,7 @@ const DEFAULT_INTERVAL_MINUTES = 60;
 const SCHEDULER_TICK_MS = 5 * 1000;
 const DEFAULT_IDLE_THRESHOLD_MS = 5 * 60 * 1000;
 const STORE_FILE_NAME = 'daily-haiku-store.json';
+const APP_ICON_PATH = path.join(__dirname, '..', '..', 'assets', 'icon.ico');
 
 let mainWindow = null;
 let appStore = null;
@@ -88,15 +89,9 @@ function createDefaultIcon() {
 }
 
 function getAppIcon() {
-  const candidates = [
-    path.join(__dirname, '..', '..', 'assets', 'icon.ico'),
-    path.join(__dirname, '..', '..', 'icon.ico')
-  ];
-  const diskIcon = candidates
-    .map((candidate) => nativeImage.createFromPath(candidate))
-    .find((icon) => !icon.isEmpty());
+  const diskIcon = nativeImage.createFromPath(APP_ICON_PATH);
 
-  return diskIcon || createDefaultIcon();
+  return diskIcon.isEmpty() ? createDefaultIcon() : diskIcon;
 }
 
 function loadHaikuData() {
@@ -436,7 +431,7 @@ function createWindow() {
     autoHideMenuBar: true,
     backgroundColor: '#1a1714',
     show: false,
-    icon: getAppIcon(),
+    icon: APP_ICON_PATH,
     webPreferences: {
       preload: path.join(__dirname, '..', 'preload', 'preload.js'),
       contextIsolation: true,
